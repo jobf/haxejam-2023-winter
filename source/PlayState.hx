@@ -37,8 +37,8 @@ class PlayState extends FlxState
 		var y_center = Std.int(FlxG.height / 2);
 
 		player = new Actor({
-			y_start: x_center,
-			x_start: y_center,
+			x_start: x_center,
+			y_start: y_center,
 			x_velocity_max: 400,
 			y_velocity_max: 400,
 			drag_multiplier: 2
