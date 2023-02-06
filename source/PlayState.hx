@@ -190,6 +190,8 @@ class PlayState extends FlxState
 			// todo - count items ? tally score ?
 			item.kill();
 		}
+
+		collected_items = [];
 	}
 
 	var collected_items:Array<Item> = [];
