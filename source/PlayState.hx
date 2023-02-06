@@ -2,8 +2,7 @@ package;
 
 import engine.actor.Actor;
 import engine.actor.Controller;
-import engine.building.Layout;
-import engine.building.Wall;
+import engine.building.Apartment;
 import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint;
 import engine.tasks.laundry.Basket;
@@ -13,25 +12,18 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
-import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
-import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
 class PlayState extends FlxState
 {
 	var controller:Controller;
-	var player:Actor;
 	var edge_left:Int;
 	var edge_top:Int;
 	var grid_size:Int;
 
-	var walls:FlxTypedGroup<Wall>;
-	var laundry:FlxTypedGroup<Item>;
 	var collected_laundry:FlxTypedGroup<Item>;
-	var basket:Basket;
-	// var main_camera:FlxCamera;
 	var hud_camera:FlxCamera;
 	var hud:Hud;
 	var level_timer:FlxTimer;
@@ -40,6 +32,12 @@ class PlayState extends FlxState
 	var camera_zoom_tween:FlxTween;
 	var zoom_out_max:Float = 0.72;
 	var zoom_increment:Float = 0.002;
+	var apartment:Apartment;
+	var collected_items:Array<Item> = [];
+	var collection_size:Int = 16;
+	var collection_size_gap:Int = 10;
+	var collection_x:Int;
+	var collection_y:Int;
 
 	override public function create()
 	{
@@ -57,44 +55,18 @@ class PlayState extends FlxState
 		edge_top = 40;
 		grid_size = 32;
 
-		walls = new FlxTypedGroup<Wall>();
-		add(walls);
-
-		laundry = new FlxTypedGroup<Item>();
-		add(laundry);
-
 		collected_laundry = new FlxTypedGroup<Item>();
 		hud.add(collected_laundry);
 
-		var empty_spots:Array<Placement> = [];
+		apartment = new Apartment(floor_plan, edge_left, edge_top, grid_size);
+		add(apartment);
 
-		for (placement in Layout.placements(floor_plan, edge_left, edge_top, grid_size))
-		{
-			switch placement.location
-			{
-				case WALL:
-					place_wall(placement);
-				case BASKET:
-					place_basket(placement);
-				case PLAYER:
-					place_player(placement);
-				case EMPTY:
-					empty_spots.push(placement);
-			}
-		}
+		FlxG.camera.follow(apartment.player);
+		controller = new Controller(apartment.player);
 
-		// shuffle the empty spots before distributing items
-		FlxG.random.shuffle(empty_spots);
+		apartment.player.on_start_moving = () -> player_started_moving();
+		apartment.player.on_stop_moving = () -> player_stopped_moving();
 
-		var index_empty_spot = 0;
-
-		// distribute laundry
-		var total_dirty_laundry = 8;
-		for (i in 0...total_dirty_laundry)
-		{
-			place_dirty_laundry(empty_spots[i]);
-			index_empty_spot++;
-		}
 		collection_x = 10;
 		collection_y = FlxG.height - 42;
 
@@ -108,88 +80,43 @@ class PlayState extends FlxState
 		var level_duration_seconds = 30;
 		level_timer = new FlxTimer();
 		level_timer.start(level_duration_seconds, timer -> end_level());
-		
+
 		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, () -> return level_timer.progress * level_duration_seconds, 0, 30);
 		level_progress_bar.scrollFactor.set(0, 0);
 		level_progress_bar.cameras = [hud_camera];
 		hud.add(level_progress_bar);
 	}
 
-	function end_level() {
+	function end_level()
+	{
 		trace('level ends!');
 		FlxG.camera.fade(FlxColor.BLACK, 1, false, start_next_level);
 	}
 
-	function start_next_level():Void {
+	function start_next_level():Void
+	{
 		var pause_for_thought = new FlxTimer();
 		pause_for_thought.start(0.5, timer -> FlxG.resetState());
 	}
 
-	function place_player(spot:Placement)
+	function player_stopped_moving()
 	{
-		player = new Actor({
-			x_start: spot.x_pixel,
-			y_start: spot.y_pixel,
-			x_velocity_max: 400,
-			y_velocity_max: 400,
-			drag_multiplier: 6
-		});
-
-		add(player);
-		FlxG.camera.follow(player);
-
-		controller = new Controller(player);
-		player.on_start_moving = () -> player_started_moving();
-		player.on_stop_moving = () -> player_stopped_moving();
-	}
-
-	function player_stopped_moving() {
 		is_player_moving = false;
 		// tween zoom back to normal
-		camera_zoom_tween = FlxTween.num(FlxG.camera.zoom, 1.0, 0.25, f -> {
+		camera_zoom_tween = FlxTween.num(FlxG.camera.zoom, 1.0, 0.25, f ->
+		{
 			FlxG.camera.zoom = f;
 			trace('new zoom  $f');
 		});
 	}
 
-	function player_started_moving() {
+	function player_started_moving()
+	{
 		is_player_moving = true;
-		if(camera_zoom_tween != null && camera_zoom_tween.active){
+		if (camera_zoom_tween != null && camera_zoom_tween.active)
+		{
 			camera_zoom_tween.cancel();
 		}
-	}
-
-	function place_wall(spot:Placement)
-	{
-		walls.add(new Wall({
-			x: spot.x_pixel,
-			y: spot.y_pixel,
-			size: grid_size,
-			color: 0x6a5f49ff
-		}));
-	}
-
-	function place_basket(spot:Placement)
-	{
-		var basket_size = 64;
-		var basket_center = basket_size / 2;
-		basket = new Basket({
-			x: Std.int(spot.x_pixel - basket_center),
-			y: Std.int(spot.y_pixel - basket_center),
-			size: basket_size,
-			color: 0xffffffff
-		});
-		add(basket);
-	}
-
-	function place_dirty_laundry(spot:Placement)
-	{
-		laundry.add(new Item({
-			x: spot.x_pixel,
-			y: spot.y_pixel,
-			size: grid_size,
-			color: 0xFFf3edc6
-		}));
 	}
 
 	override public function update(elapsed:Float)
@@ -209,16 +136,17 @@ class PlayState extends FlxState
 			FlxG.resetState();
 		}
 		// stop running through walls
-		FlxG.collide(player, walls);
+		FlxG.collide(apartment.player, apartment.walls);
 
 		// interact with items
-		FlxG.overlap(laundry, player, overlap_laundry_with_player);
+		FlxG.overlap(apartment.laundry, apartment.player, overlap_laundry_with_player);
 
 		// drop laundry
-		FlxG.overlap(basket, player, overlap_basket_with_player);
+		FlxG.overlap(apartment.basket, apartment.player, overlap_basket_with_player);
 
 		// zoom camear out while player is moving
-		if(is_player_moving && FlxG.camera.zoom > zoom_out_max){
+		if (is_player_moving && FlxG.camera.zoom > zoom_out_max)
+		{
 			FlxG.camera.zoom -= zoom_increment;
 		}
 	}
@@ -244,12 +172,6 @@ class PlayState extends FlxState
 
 		collected_items = [];
 	}
-
-	var collected_items:Array<Item> = [];
-	var collection_size:Int = 16;
-	var collection_size_gap:Int = 10;
-	var collection_x:Int;
-	var collection_y:Int;
 
 	function collect(laundry:Item)
 	{
