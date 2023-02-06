@@ -13,6 +13,8 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
+import flixel.tweens.FlxEase;
+import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
@@ -34,6 +36,10 @@ class PlayState extends FlxState
 	var hud:Hud;
 	var level_timer:FlxTimer;
 	var level_progress_bar:CallbackFlxBar;
+	var is_player_moving:Bool = false;
+	var camera_zoom_tween:FlxTween;
+	var zoom_out_max:Float = 0.72;
+	var zoom_increment:Float = 0.002;
 
 	override public function create()
 	{
@@ -133,6 +139,24 @@ class PlayState extends FlxState
 		FlxG.camera.follow(player);
 
 		controller = new Controller(player);
+		player.on_start_moving = () -> player_started_moving();
+		player.on_stop_moving = () -> player_stopped_moving();
+	}
+
+	function player_stopped_moving() {
+		is_player_moving = false;
+		// tween zoom back to normal
+		camera_zoom_tween = FlxTween.num(FlxG.camera.zoom, 1.0, 0.25, f -> {
+			FlxG.camera.zoom = f;
+			trace('new zoom  $f');
+		});
+	}
+
+	function player_started_moving() {
+		is_player_moving = true;
+		if(camera_zoom_tween != null && camera_zoom_tween.active){
+			camera_zoom_tween.cancel();
+		}
 	}
 
 	function place_wall(spot:Placement)
@@ -192,6 +216,11 @@ class PlayState extends FlxState
 
 		// drop laundry
 		FlxG.overlap(basket, player, overlap_basket_with_player);
+
+		// zoom camear out while player is moving
+		if(is_player_moving && FlxG.camera.zoom > zoom_out_max){
+			FlxG.camera.zoom -= zoom_increment;
+		}
 	}
 
 	function overlap_laundry_with_player(laundry:Item, player:Actor)
@@ -237,7 +266,7 @@ class PlayState extends FlxState
 		collected.scrollFactor.set(0, 0);
 	}
 
-	var zoom_amount:Float = 0.5;
+	var zoom_amount:Float = 0.05;
 
 	function zoom(direction:Int)
 	{

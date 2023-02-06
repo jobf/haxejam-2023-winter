@@ -31,20 +31,22 @@ class Controller
 	{
 		actor.set_direction_y(1);
 	}
-	
-	function stop(){
-		actor.stop();
+
+	function stop(notify_stopped:Bool)
+	{
+		actor.stop(notify_stopped);
 	}
 
 	var keys_left:Array<FlxKey> = [LEFT, A];
 	var keys_right:Array<FlxKey> = [RIGHT, D];
 	var keys_up:Array<FlxKey> = [UP, W];
 	var keys_down:Array<FlxKey> = [DOWN, S];
+	var keys_all_movement:Array<FlxKey> = [LEFT, A, RIGHT, D, UP, W, DOWN, S];
 
 	public function update(keys:FlxKeyboard)
 	{
-		stop();
-		
+		stop(false);
+
 		if (keys.anyPressed(keys_left))
 		{
 			move_left();
@@ -60,6 +62,9 @@ class Controller
 		if (keys.anyPressed(keys_down))
 		{
 			move_down();
+		}
+		if(keys.anyJustReleased(keys_all_movement)){
+			stop(true);
 		}
 	}
 }
