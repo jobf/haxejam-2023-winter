@@ -4,6 +4,7 @@ import engine.actor.Actor;
 import engine.actor.Controller;
 import engine.building.Layout;
 import engine.building.Wall;
+import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint;
 import engine.tasks.laundry.Basket;
 import engine.tasks.laundry.Item;
@@ -12,7 +13,9 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
+import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
+import flixel.util.FlxTimer;
 
 class PlayState extends FlxState
 {
@@ -29,9 +32,8 @@ class PlayState extends FlxState
 	// var main_camera:FlxCamera;
 	var hud_camera:FlxCamera;
 	var hud:Hud;
-
-
-
+	var level_timer:FlxTimer;
+	var level_progress_bar:CallbackFlxBar;
 
 	override public function create()
 	{
@@ -42,7 +44,7 @@ class PlayState extends FlxState
 
 		hud = new Hud();
 		add(hud);
-		
+
 		var floor_plan = BluePrint.generate_floor_plan();
 
 		edge_left = 40;
@@ -90,13 +92,31 @@ class PlayState extends FlxState
 		collection_x = 10;
 		collection_y = FlxG.height - 42;
 
-		hud_camera = new FlxCamera(0,0,FlxG.camera.width, FlxG.camera.height);
+		hud_camera = new FlxCamera(0, 0, FlxG.camera.width, FlxG.camera.height);
 		hud_camera.zoom = 1;
 		hud_camera.alpha = 0.8;
 		hud_camera.bgColor = FlxColor.TRANSPARENT;
 		hud_camera.follow(hud.background, FlxCameraFollowStyle.NO_DEAD_ZONE);
-		
+
 		FlxG.cameras.add(hud_camera);
+		var level_duration_seconds = 30;
+		level_timer = new FlxTimer();
+		level_timer.start(level_duration_seconds, timer -> end_level());
+		
+		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, () -> return level_timer.progress * level_duration_seconds, 0, 30);
+		level_progress_bar.scrollFactor.set(0, 0);
+		level_progress_bar.cameras = [hud_camera];
+		hud.add(level_progress_bar);
+	}
+
+	function end_level() {
+		trace('level ends!');
+		FlxG.camera.fade(FlxColor.BLACK, 1, false, start_next_level);
+	}
+
+	function start_next_level():Void {
+		var pause_for_thought = new FlxTimer();
+		pause_for_thought.start(0.5, timer -> FlxG.resetState());
 	}
 
 	function place_player(spot:Placement)
@@ -184,8 +204,10 @@ class PlayState extends FlxState
 		deposit_collected_items();
 	}
 
-	function deposit_collected_items() {
-		for (item in collected_items) {
+	function deposit_collected_items()
+	{
+		for (item in collected_items)
+		{
 			// todo - animate item deposit
 			// todo - count items ? tally score ?
 			item.kill();
@@ -209,11 +231,10 @@ class PlayState extends FlxState
 			size: collection_size,
 			color: laundry.config.color
 		});
-		collected.cameras  = [hud_camera];
+		collected.cameras = [hud_camera];
 		collected_items.push(collected);
 		collected_laundry.add(collected);
-		collected.scrollFactor.x = 0;
-		collected.scrollFactor.y = 0;
+		collected.scrollFactor.set(0, 0);
 	}
 
 	var zoom_amount:Float = 0.5;
@@ -234,8 +255,8 @@ class PlayState extends FlxState
 	}
 }
 
-
-class Hud extends FlxGroup{
+class Hud extends FlxGroup
+{
 	public var background:FlxSprite;
 
 	public function new()
@@ -245,7 +266,7 @@ class Hud extends FlxGroup{
 		// add a graphic for the hud_camera to follow
 		// it needs to be out of the bounds of the main camera
 		// otherwise we see the main camera content duplicated
-		
+
 		var x:Int = 100000;
 		background = new FlxSprite(x, 0);
 		background.makeGraphic(1, 1, FlxColor.TRANSPARENT);
