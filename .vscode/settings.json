@@ -1,0 +1,11 @@
+{
+	"search.exclude": {
+		"export/**/*.hx": true
+	},
+	"[haxe]": {
+		"editor.codeActionsOnSave": {
+			"source.sortImports": true
+		}
+	},
+	"haxe.enableExtendedIndentation": true
+}
