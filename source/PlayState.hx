@@ -169,11 +169,27 @@ class PlayState extends FlxState
 
 		// interact with items
 		FlxG.overlap(laundry, player, overlap_laundry_with_player);
+
+		// drop laundry
+		FlxG.overlap(basket, player, overlap_basket_with_player);
 	}
 
 	function overlap_laundry_with_player(laundry:Item, player:Actor)
 	{
 		collect(laundry);
+	}
+
+	function overlap_basket_with_player(basket:Basket, player:Actor)
+	{
+		deposit_collected_items();
+	}
+
+	function deposit_collected_items() {
+		for (item in collected_items) {
+			// todo - animate item deposit
+			// todo - count items ? tally score ?
+			item.kill();
+		}
 	}
 
 	var collected_items:Array<Item> = [];
