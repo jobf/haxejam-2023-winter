@@ -1,23 +1,20 @@
-package engine.building;
+package engine.tasks.laundry;
 
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
 
 @:structInit
-class WallConfig
-{
-	public var x:Int;
-	public var y:Int;
+class ItemConfig{
+	public var x:Float;
+	public var y:Float;
 	public var color:FlxColor;
 	public var size:Int;
 }
 
-class Wall extends FlxSprite
-{
-	public var config:WallConfig;
+class Item extends FlxSprite{
+	public var config:ItemConfig;
 
-	public function new(config:WallConfig)
-	{
+	public function new(config:ItemConfig){
 		super(config.x, config.y);
 		this.config = config;
 		makeGraphic(config.size, config.size, config.color);

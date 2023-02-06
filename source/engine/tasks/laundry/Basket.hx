@@ -1,26 +1,24 @@
-package engine.building;
+package engine.tasks.laundry;
 
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
 
 @:structInit
-class WallConfig
-{
+class BasketConfig{
 	public var x:Int;
 	public var y:Int;
 	public var color:FlxColor;
 	public var size:Int;
 }
 
-class Wall extends FlxSprite
-{
-	public var config:WallConfig;
+class Basket extends FlxSprite{
+	public var config:BasketConfig;
 
-	public function new(config:WallConfig)
-	{
+	public function new(config:BasketConfig){
 		super(config.x, config.y);
 		this.config = config;
 		makeGraphic(config.size, config.size, config.color);
 		immovable = true;
+		trace('made basket $x $y');
 	}
 }
