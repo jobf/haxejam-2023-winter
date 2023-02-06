@@ -1,5 +1,6 @@
 package engine.actor;
 
+import flixel.input.keyboard.FlxKey;
 import flixel.input.keyboard.FlxKeyboard;
 
 class Controller
@@ -35,23 +36,28 @@ class Controller
 		actor.stop();
 	}
 
+	var keys_left:Array<FlxKey> = [LEFT, A];
+	var keys_right:Array<FlxKey> = [RIGHT, D];
+	var keys_up:Array<FlxKey> = [UP, W];
+	var keys_down:Array<FlxKey> = [DOWN, S];
+
 	public function update(keys:FlxKeyboard)
 	{
 		stop();
 		
-		if (keys.pressed.LEFT)
+		if (keys.anyPressed(keys_left))
 		{
 			move_left();
 		}
-		if (keys.pressed.RIGHT)
+		if (keys.anyPressed(keys_right))
 		{
 			move_right();
 		}
-		if (keys.pressed.UP)
+		if (keys.anyPressed(keys_up))
 		{
 			move_up();
 		}
-		if (keys.pressed.DOWN)
+		if (keys.anyPressed(keys_down))
 		{
 			move_down();
 		}
