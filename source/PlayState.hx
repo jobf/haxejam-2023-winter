@@ -41,7 +41,7 @@ class PlayState extends FlxState
 			y_start: y_center,
 			x_velocity_max: 400,
 			y_velocity_max: 400,
-			drag_multiplier: 2
+			drag_multiplier: 6
 		});
 
 		add(player);
