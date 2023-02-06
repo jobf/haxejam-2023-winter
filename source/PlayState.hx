@@ -230,7 +230,7 @@ class Hud extends FlxGroup{
 		
 		var x:Int = 100000;
 		background = new FlxSprite(x, 0);
-		background.makeGraphic(0, 0, FlxColor.TRANSPARENT);
+		background.makeGraphic(1, 1, FlxColor.TRANSPARENT);
 		add(background);
 	}
 }
