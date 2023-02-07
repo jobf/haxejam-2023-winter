@@ -5,8 +5,8 @@ import engine.actor.Controller;
 import engine.building.Apartment;
 import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint;
-import engine.tasks.laundry.Basket;
-import engine.tasks.laundry.Item;
+import engine.tasks.Item;
+import engine.tasks.Task;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -38,6 +38,8 @@ class PlayState extends FlxState
 	var collection_size_gap:Int = 10;
 	var collection_x:Int;
 	var collection_y:Int;
+	var overlapping_task:Task;
+
 
 	override public function create()
 	{
@@ -106,7 +108,7 @@ class PlayState extends FlxState
 		camera_zoom_tween = FlxTween.num(FlxG.camera.zoom, 1.0, 0.25, f ->
 		{
 			FlxG.camera.zoom = f;
-			trace('new zoom  $f');
+			// trace('new zoom  $f');
 		});
 	}
 
@@ -135,19 +137,27 @@ class PlayState extends FlxState
 		{
 			FlxG.resetState();
 		}
+
+		overlapping_task = null;
 		// stop running through walls
 		FlxG.collide(apartment.player, apartment.walls);
 
 		// interact with items
 		FlxG.overlap(apartment.laundry, apartment.player, overlap_laundry_with_player);
 
-		// drop laundry
-		FlxG.overlap(apartment.basket, apartment.player, overlap_basket_with_player);
+		// complete chores
+		FlxG.overlap(apartment.basket, apartment.player, overlap_task_with_player);
+		FlxG.overlap(apartment.toilet, apartment.player, overlap_task_with_player);
 
-		// zoom camear out while player is moving
+		// zoom camera out while player is moving
 		if (is_player_moving && FlxG.camera.zoom > zoom_out_max)
 		{
 			FlxG.camera.zoom -= zoom_increment;
+		}
+
+		// progress task if player is at one
+		if(overlapping_task != null){
+			overlapping_task.decrease_task_remaining(elapsed, deposit_collected_items);
 		}
 	}
 
@@ -156,13 +166,14 @@ class PlayState extends FlxState
 		collect(laundry);
 	}
 
-	function overlap_basket_with_player(basket:Basket, player:Actor)
+	function overlap_task_with_player(task:Task, player:Actor)
 	{
-		deposit_collected_items();
+		overlapping_task = task;
 	}
-
+	
 	function deposit_collected_items()
 	{
+		trace('deposit_collected_items');
 		for (item in collected_items)
 		{
 			// todo - animate item deposit

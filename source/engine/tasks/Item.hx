@@ -1,4 +1,4 @@
-package engine.tasks.laundry;
+package engine.tasks;
 
 import flixel.FlxSprite;
 import flixel.util.FlxColor;

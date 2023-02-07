@@ -2,9 +2,10 @@ package engine.building;
 
 import engine.actor.Actor;
 import engine.building.Layout.Placement;
+import engine.flx.CallbackFlxBar;
 import engine.map.Data.FloorPlan;
-import engine.tasks.laundry.Basket;
-import engine.tasks.laundry.Item;
+import engine.tasks.Item;
+import engine.tasks.Task;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
 
@@ -13,12 +14,18 @@ class Apartment extends FlxGroup
 	public var player(default, null):Actor;
 	public var walls(default, null):FlxTypedGroup<Wall>;
 	public var laundry(default, null):FlxTypedGroup<Item>;
-	public var basket(default, null):Basket;
+	public var basket(default, null):Task;
+	public var toilet(default, null):Task;
 
 	var empty_spots:Array<Placement>;
 	var edge_left:Int;
 	var edge_top:Int;
 	var grid_size:Int;
+	var basket_progress:CallbackFlxBar;
+	var toilet_progress:CallbackFlxBar;
+
+
+
 
 	public function new(plan:FloorPlan, edge_left:Int, edge_top:Int, grid_size:Int)
 	{
@@ -43,6 +50,8 @@ class Apartment extends FlxGroup
 					place_wall(placement);
 				case BASKET:
 					place_basket(placement);
+				case LAVATORY:
+					place_lavatory(placement);
 				case PLAYER:
 					place_player(placement);
 				case EMPTY:
@@ -63,7 +72,6 @@ class Apartment extends FlxGroup
 			index_empty_spot++;
 		}
 	}
-
 	function place_player(spot:Placement)
 	{
 		player = new Actor({
@@ -91,13 +99,33 @@ class Apartment extends FlxGroup
 	{
 		var basket_size = 64;
 		var basket_center = basket_size / 2;
-		basket = new Basket({
+		basket = new Task({
 			x: Std.int(spot.x_pixel - basket_center),
 			y: Std.int(spot.y_pixel - basket_center),
 			size: basket_size,
-			color: 0xffffffff
+			color: 0xffffffff,
+			task_duration_seconds: 0.3,
+			task_cooloff_seconds: 4.0,
 		});
 		add(basket);
+		basket_progress = new CallbackFlxBar(basket.x + basket_size + 4, basket.y, BOTTOM_TO_TOP, 20, 30, () -> basket.get_progress(), 0, basket.get_duration());
+		add(basket_progress);
+	}
+
+	function place_lavatory(placement:Placement) {
+		var task_size = 64;
+		var toilet_center = task_size / 2;
+		toilet = new Task({
+			x: Std.int(placement.x_pixel - toilet_center),
+			y: Std.int(placement.y_pixel - toilet_center),
+			size: task_size,
+			color: 0xff876b61,
+			task_duration_seconds: 5.0, 
+			task_cooloff_seconds: 999.0, // only let it happen once per session
+		});
+		add(toilet);
+		toilet_progress = new CallbackFlxBar(toilet.x + task_size + 4, toilet.y, BOTTOM_TO_TOP, 20, 30, () -> toilet.get_progress(), 0, toilet.get_duration());
+		add(toilet_progress);
 	}
 
 	function place_dirty_laundry(spot:Placement)

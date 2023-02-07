@@ -27,6 +27,7 @@ class Layout {
 							location: switch symbol {
 								case "#": WALL;
 								case "B": BASKET;
+								case "L": LAVATORY;
 								case "@": PLAYER;
 								case _: EMPTY;
 							}
@@ -55,4 +56,5 @@ enum Location{
 	PLAYER;
 	WALL;
 	BASKET;
+	LAVATORY;
 }
