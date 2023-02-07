@@ -45,7 +45,7 @@ class PlayState extends FlxState
 	override public function create()
 	{
 		super.create();
-
+		bgColor = 0xff959595;
 		FlxG.worldBounds.width = 4096;
 		FlxG.worldBounds.height = 4096;
 
@@ -89,7 +89,11 @@ class PlayState extends FlxState
 		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, () -> return level_timer.progress * level_duration_seconds, 0, 30);
 		level_progress_bar.scrollFactor.set(0, 0);
 		level_progress_bar.cameras = [hud_camera];
+		for (help_text in apartment.help_texts.members) {
+			help_text.cameras = [hud_camera];
+		}
 		hud.add(level_progress_bar);
+		hud.add(apartment.help_texts);
 	}
 
 	function end_level()

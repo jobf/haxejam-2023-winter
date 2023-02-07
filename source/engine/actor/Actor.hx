@@ -16,7 +16,7 @@ class ActorConfig
 	var drag_multiplier:Float;
 
 	var size:Int = 64;
-	var color:FlxColor = 0xC0C0C0ff;
+	var color:FlxColor = 0xC0B12531;
 }
 
 @:allow(engine.actor.Controller)

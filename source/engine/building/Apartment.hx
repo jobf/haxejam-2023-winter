@@ -16,6 +16,7 @@ class Apartment extends FlxGroup
 	public var tasks(default, null):FlxTypedGroup<Task>;
 	public var walls(default, null):FlxTypedGroup<Wall>;
 	public var laundry(default, null):FlxTypedGroup<Item>;
+	public var help_texts(default, null):FlxGroup;
 	
 	var empty_spots:Array<Placement>;
 	var edge_left:Int;
@@ -38,6 +39,8 @@ class Apartment extends FlxGroup
 
 		laundry = new FlxTypedGroup<Item>();
 		add(laundry);
+
+		help_texts = new FlxGroup();
 
 
 		empty_spots = [];
@@ -94,6 +97,7 @@ class Apartment extends FlxGroup
 	}
 
 	public var task_list(default, null):Map<Location, Task> = [];
+	
 	function place_task(placement:Placement){
 		var task_size = 48;
 		var toilet_center = task_size / 2;
@@ -103,16 +107,26 @@ class Apartment extends FlxGroup
 			size: task_size,
 			color: get_color(placement.location),
 			task_duration_seconds: get_task_duration(placement.location), 
-			task_cooloff_seconds: 999.0, // only let it happen once per session
+			task_cooloff_seconds: get_task_cool_off(placement.location), // only let it happen once per session
+			help: get_task_help_message(placement.location),
 		}, placement);
 		tasks.add(task);
 		add(task.progress_meter);
 		task_list[placement.location] = task;
+		help_texts.add(task.help);
+	}
+
+	function get_task_help_message(location:Location):String {
+		return switch location {
+			case BASKET: "BRING ME CLOTHES !";
+			case LAVATORY: "STAY WITH ME !";
+			case _: "";
+		}
 	}
 
 	function get_task_duration(location:Location):Float {
 		return switch location {
-			case BASKET: 0.3;
+			case BASKET: 1.0;
 			case LAVATORY: 5.0;
 			case _: 0.0;
 		}
@@ -128,7 +142,7 @@ class Apartment extends FlxGroup
 	function get_color(location:Location):FlxColor {
 		return switch location {
 			case EMPTY: FlxColor.TRANSPARENT;
-			case PLAYER: 0xC0C0C0ff;
+			case PLAYER: 0xC0B12531;
 			case WALL:0x6a5f49ff;
 			case BASKET:0xffffffff;
 			case LAVATORY:0xff876b61;

@@ -2,13 +2,16 @@ package engine.tasks;
 
 import engine.building.Layout;
 import engine.flx.CallbackFlxBar;
+import engine.ui.Fonts;
 import flixel.FlxSprite;
+import flixel.text.FlxBitmapText;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
 @:structInit
 class TaskConfig
 {
+	public var help:String = "";
 	public var x:Int;
 	public var y:Int;
 	public var color:FlxColor;
@@ -22,12 +25,13 @@ class Task extends FlxSprite
 	public var config:TaskConfig;
 
 	var task_remaining_seconds:Float;
-	// var cooloff_remaining_seconds:Float;
 	var is_player_here:Bool;
 	var timer:FlxTimer;
 	var is_cooling_off:Bool;
 	public var progress_meter:CallbackFlxBar;
 	public var placement:Placement;
+	public var help:FlxBitmapText;
+
 	
 	public function new(config:TaskConfig, placement:Placement)
 	{
@@ -40,17 +44,25 @@ class Task extends FlxSprite
 		is_cooling_off = false;
 		timer = new FlxTimer();
 		progress_meter = new CallbackFlxBar(x + config.size + 4, y, BOTTOM_TO_TOP, 20, 30, () -> get_progress(), 0, get_duration());
+		help = new FlxBitmapText(Fonts.normal());
+		help.text = config.help;
+		help.screenCenter();
+		help.y -= 130;
+		help.visible = false;
+		help.scrollFactor.set(0,0);
 		trace('init task : $x $y');
 	}
 
 	public function decrease_task_remaining(seconds:Float, on_task_complete:() -> Void)
 	{
 		if(is_cooling_off){
+			help.visible = false;
 			return;
 		}
 		
 		if (task_remaining_seconds > 0)
 		{
+			help.visible = true;
 			task_remaining_seconds -= seconds;
 			if (task_remaining_seconds <= 0)
 			{
