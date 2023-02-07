@@ -3,6 +3,7 @@ package;
 import engine.actor.Actor;
 import engine.actor.Controller;
 import engine.building.Apartment;
+import engine.building.Layout;
 import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint;
 import engine.tasks.Item;
@@ -62,6 +63,8 @@ class PlayState extends FlxState
 
 		apartment = new Apartment(floor_plan, edge_left, edge_top, grid_size);
 		add(apartment);
+
+		task_complete[BASKET] = deposit_collected_items;
 
 		FlxG.camera.follow(apartment.player);
 		controller = new Controller(apartment.player);
@@ -138,28 +141,33 @@ class PlayState extends FlxState
 			FlxG.resetState();
 		}
 
-		overlapping_task = null;
 		// stop running through walls
 		FlxG.collide(apartment.player, apartment.walls);
-
+		
 		// interact with items
 		FlxG.overlap(apartment.laundry, apartment.player, overlap_laundry_with_player);
+		
+		// complete tasks, set to null first because player may have moved
+		overlapping_task = null;
+		FlxG.overlap(apartment.tasks, apartment.player, overlap_task_with_player);
 
-		// complete chores
-		FlxG.overlap(apartment.basket, apartment.player, overlap_task_with_player);
-		FlxG.overlap(apartment.toilet, apartment.player, overlap_task_with_player);
+		// progress task if player is at one
+		if(overlapping_task != null){
+			var on_complete = task_complete.exists(overlapping_task.placement.location) 
+			? task_complete[overlapping_task.placement.location]
+			: () -> return;
+			
+			overlapping_task.decrease_task_remaining(elapsed, on_complete);
+		}
 
 		// zoom camera out while player is moving
 		if (is_player_moving && FlxG.camera.zoom > zoom_out_max)
 		{
 			FlxG.camera.zoom -= zoom_increment;
 		}
-
-		// progress task if player is at one
-		if(overlapping_task != null){
-			overlapping_task.decrease_task_remaining(elapsed, deposit_collected_items);
-		}
 	}
+
+	var task_complete:Map<Location, ()->Void> = [];
 
 	function overlap_laundry_with_player(laundry:Item, player:Actor)
 	{
