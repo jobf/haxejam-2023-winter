@@ -17,6 +17,8 @@ class ActorConfig
 
 	var size:Int = 64;
 	var color:FlxColor = 0xC0B12531;
+
+	var asset_path:String = "";
 }
 
 @:allow(engine.actor.Controller)
@@ -34,13 +36,18 @@ class Actor extends FlxSprite
 		super(config.x_start, config.y_start);
 		this.config = config;
 		x_offset_center = config.size / 2;
-
+		
 		// init 1x1 pixel graphic so it can be scaled to any size
-		makeGraphic(1, 1, config.color);
+		if(config.asset_path.length > 0){
+			loadGraphic(config.asset_path);
+		}
+		else{
+			makeGraphic(1, 1, config.color);
+			// scale t0 actual size
+			scale.x = config.size;
+			scale.y = config.size;
+		}
 
-		// scale t0 actual size
-		scale.x = config.size;
-		scale.y = config.size;
 
 		// increase hitbox because it starts at 1 x 1
 		width = config.size * 0.7;

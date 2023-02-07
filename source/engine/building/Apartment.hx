@@ -76,6 +76,7 @@ class Apartment extends FlxGroup
 	function place_player(spot:Placement)
 	{
 		player = new Actor({
+			asset_path: "assets/images/blob-64.png",
 			x_start: spot.x_pixel,
 			y_start: spot.y_pixel,
 			x_velocity_max: 400,
