@@ -9,6 +9,7 @@ import engine.map.Canvas.AsciiCanvas;
 import engine.map.Data.FloorPlan;
 import engine.tasks.Item;
 import engine.tasks.Task;
+import engine.tasks.TaskList.TaskData;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.tile.FlxBaseTilemap;
@@ -30,12 +31,13 @@ class ApartmentDungen extends FlxGroup
 	var rng:RandomInt;
 	var map_auto(default, null):FlxTilemap;
 
-	public function new(rooms:Array<RoomSpace>, w:Int, h:Int, grid_size:Int)
+	public function new(rooms:Array<RoomSpace>, w:Int, h:Int, grid_size:Int, tasks_to_complete:Array<Location>)
 	{
 		super();
 
 		this.grid_size = grid_size;
 		rng = FlxG.random.int;
+		
 		var interior_walls = new AsciiCanvas(w, h);
 
 		var first = 0;
@@ -140,21 +142,40 @@ class ApartmentDungen extends FlxGroup
 			location: PLAYER
 		});
 
-		var wash_room = rooms[0];
-		var x_basket_location = Std.int(wash_room.walls.x +  wash_room.walls.w / 2);
-		var y_basket_location = Std.int(wash_room.walls.x +  wash_room.walls.w / 2);
-		interior_walls.set_cell(x_basket_location, y_basket_location, "B");
+		var task_placements:Map<Location, Placement> = [];
 
-		place_task({
-			y_pixel: y_basket_location * grid_size,
-			x_pixel: x_basket_location * grid_size,
+		var task_room = rooms[0];
+		var x_task_location = Std.int(task_room.walls.x +  task_room.walls.w / 2);
+		var y_task_location = Std.int(task_room.walls.x +  task_room.walls.w / 2);
+		interior_walls.set_cell(x_task_location, y_task_location, "B");
+		var placement:Placement = {
+			y_pixel: x_task_location * grid_size,
+			x_pixel: x_task_location * grid_size,
 			location: BASKET
-		});
-		
-		// var empty:Array<Placement> = interior_walls.get_empty_spaces(grid_size);
+		}
+		task_placements[BASKET] = placement;
+
+		var taks_room = rooms[1];
+		var x_task_location = Std.int(taks_room.walls.x +  taks_room.walls.w / 2);
+		var y_task_location = Std.int(taks_room.walls.x +  taks_room.walls.w / 2);
+		interior_walls.set_cell(x_task_location, y_task_location, "L");
+		var placement:Placement = {
+			y_pixel: x_task_location * grid_size,
+			x_pixel: x_task_location * grid_size,
+			location: LAVATORY
+		}
+		task_placements[LAVATORY] = placement;
+
+		for(location in tasks_to_complete){
+			if(task_placements.exists(location)){
+				place_task(task_placements[location]);
+			}
+			else{
+				trace('!!! WARNING no placement configured for $location');
+			}
+		}
 
 		empty_spots = interior_walls.get_empty_spaces(grid_size);
-
 
 		// shuffle the empty spots before distributing items
 		FlxG.random.shuffle(empty_spots);
@@ -197,52 +218,25 @@ class ApartmentDungen extends FlxGroup
 			y: Std.int(placement.y_pixel - toilet_center),
 			size: task_size,
 			color: get_color(placement.location),
-			task_duration_seconds: get_task_duration(placement.location),
-			task_cooloff_seconds: get_task_cool_off(placement.location), // only let it happen once per session
-			hint: get_task_hint_message(placement.location),
-			is_repeatable: get_is_task_repeatable(placement.location)
+			details: TaskData.configurations[placement.location]
 		}, placement);
+		
 		tasks.add(task);
 		add(task.progress_meter);
 		task_list[placement.location] = task;
 		hint_texts.add(task.hint);
 	}
-
-	function get_is_task_repeatable(location:Location):Null<Bool> {
-		return switch location {
-			case BASKET: true;
-			case _: false;
-		}
-	}
-
-	function get_task_hint_message(location:Location):String
+	
+	function place_dirty_laundry(spot:Placement)
 	{
-		return switch location
-		{
-			case BASKET: "BRING ME CLOTHES !";
-			case LAVATORY: "STAY WITH ME !";
-			case _: "";
-		}
+		laundry.add(new Item({
+			x: spot.x_pixel,
+			y: spot.y_pixel,
+			size: grid_size,
+			color: 0xFFf3edc6
+		}));
 	}
 
-	function get_task_duration(location:Location):Float
-	{
-		return switch location
-		{
-			case BASKET: 1.0;
-			case LAVATORY: 5.0;
-			case _: 0.0;
-		}
-	}
-
-	function get_task_cool_off(location:Location):Float
-	{
-		return switch location
-		{
-			case BASKET: 4.0;
-			case _: 999; // 999 long enough to prevent reset before session end
-		}
-	}
 
 	function get_color(location:Location):FlxColor
 	{
@@ -256,13 +250,4 @@ class ApartmentDungen extends FlxGroup
 		}
 	}
 
-	function place_dirty_laundry(spot:Placement)
-	{
-		laundry.add(new Item({
-			x: spot.x_pixel,
-			y: spot.y_pixel,
-			size: grid_size,
-			color: 0xFFf3edc6
-		}));
-	}
 }

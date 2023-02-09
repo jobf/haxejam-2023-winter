@@ -2,6 +2,7 @@ package engine.tasks;
 
 import engine.building.Layout;
 import engine.flx.CallbackFlxBar;
+import engine.tasks.TaskList.TaskDetails;
 import engine.ui.Fonts;
 import flixel.FlxSprite;
 import flixel.text.FlxBitmapText;
@@ -11,15 +12,13 @@ import flixel.util.FlxTimer;
 @:structInit
 class TaskConfig
 {
-	public var hint:String = "";
 	public var x:Int;
 	public var y:Int;
 	public var color:FlxColor;
 	public var size:Int = 48;
-	public var task_duration_seconds:Float;
-	public var task_cooloff_seconds:Float;
-	public var is_repeatable:Bool = false;
+	public var details:Null<TaskDetails> = null;
 }
+
 
 class Task extends FlxSprite
 {
@@ -45,13 +44,13 @@ class Task extends FlxSprite
 		this.placement = placement;
 		makeGraphic(config.size, config.size, config.color);
 		immovable = true;
-		task_remaining_seconds = config.task_duration_seconds;
+		task_remaining_seconds = config.details.task_duration_seconds;
 		is_cooling_off = false;
 		timer = new FlxTimer();
 		timer_hint = new FlxTimer();
 		progress_meter = new CallbackFlxBar(x + config.size + 4, y, BOTTOM_TO_TOP, 20, 30, () -> get_progress(), 0, get_duration());
 		hint = new FlxBitmapText(Fonts.normal());
-		hint.text = config.hint;
+		hint.text = config.details.hint_text;
 		hint.screenCenter();
 		hint.y -= 130;
 		hint.visible = false;
@@ -75,11 +74,11 @@ class Task extends FlxSprite
 				on_task_complete();
 				trace('is cooling off');
 				is_cooling_off = true;
-				if(config.is_repeatable){
+				if(config.details.is_repeatable){
 					trace('starting cool off timer');
 					// cool off before resetting to allow repeat
-					timer.start(config.task_cooloff_seconds, timer -> {
-						task_remaining_seconds = config.task_duration_seconds;
+					timer.start(config.details.task_cooloff_seconds, timer -> {
+						task_remaining_seconds = config.details.task_duration_seconds;
 						is_cooling_off = false;
 						trace('cool off complete');
 					});
@@ -99,7 +98,7 @@ class Task extends FlxSprite
 
 	inline function get_duration():Float
 	{
-		return config.task_duration_seconds;
+		return config.details.task_duration_seconds;
 	}
 
 	public function show_hint() {

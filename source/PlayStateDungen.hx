@@ -8,6 +8,7 @@ import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint;
 import engine.tasks.Item;
 import engine.tasks.Task;
+import engine.tasks.TaskList;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -41,6 +42,8 @@ class PlayStateDungen extends FlxState
 	var collection_y:Int;
 	var overlapping_task:Task;
 
+	var task_list:TaskList;
+
 
 	override public function create()
 	{
@@ -51,6 +54,11 @@ class PlayStateDungen extends FlxState
 
 		hud = new Hud();
 		add(hud);
+
+		var tasks_to_complete = [LAVATORY];
+
+		task_list = new TaskList(tasks_to_complete);
+		task_list.set_task_on_complete(BASKET, deposit_collected_items);
 
 		var seed = -1;
 		// var seed = 5117;
@@ -64,10 +72,9 @@ class PlayStateDungen extends FlxState
 		collected_laundry = new FlxTypedGroup<Item>();
 		hud.add(collected_laundry);
 
-		apartment = new ApartmentDungen(rooms, 40,40, grid_size);
+		apartment = new ApartmentDungen(rooms, 40, 40, grid_size, tasks_to_complete);
 		add(apartment);
 
-		task_complete[BASKET] = deposit_collected_items;
 
 		FlxG.camera.follow(apartment.player);
 		controller = new Controller(apartment.player);
@@ -134,6 +141,12 @@ class PlayStateDungen extends FlxState
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+
+		if(task_list.is_list_complete())
+		{
+			trace('start next session !!!!');
+		}
+
 		controller.update(FlxG.keys);
 		if (FlxG.keys.justPressed.I)
 		{
@@ -160,10 +173,7 @@ class PlayStateDungen extends FlxState
 
 		// progress task if player is at one
 		if(overlapping_task != null){
-			var on_complete = task_complete.exists(overlapping_task.placement.location) 
-			? task_complete[overlapping_task.placement.location]
-			: () -> return;
-			
+			var on_complete = task_list.get_task_on_complete(overlapping_task.placement.location);
 			overlapping_task.decrease_task_remaining(elapsed, on_complete);
 			overlapping_task.show_hint();
 		}
@@ -175,7 +185,7 @@ class PlayStateDungen extends FlxState
 		}
 	}
 
-	var task_complete:Map<Location, ()->Void> = [];
+	
 
 	function overlap_laundry_with_player(laundry:Item, player:Actor)
 	{
