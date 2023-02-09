@@ -48,6 +48,7 @@ class PlayStateDungen extends FlxState
 	override public function create()
 	{
 		super.create();
+		Progression.reset();
 		bgColor = 0xff959595;
 		FlxG.worldBounds.width = 4096;
 		FlxG.worldBounds.height = 4096;
@@ -55,15 +56,19 @@ class PlayStateDungen extends FlxState
 		hud = new Hud();
 		add(hud);
 
-		var tasks_to_complete = [LAVATORY];
-
+		
+		var tasks_to_complete = Progression.get_tasks();
+		trace('completed levels =  ${Progression.completed_session_count}, num tasks now ${tasks_to_complete.length}');
+		
 		task_list = new TaskList(tasks_to_complete);
 		task_list.set_task_on_complete(BASKET, deposit_collected_items);
 
-		var seed = -1;
-		// var seed = 5117;
+		var width = 36;
+		var height = 36;
+		var seed = -1; // will use random seed
+		// var seed = 5117; // for testing specific 
 		var blue_print = new BluePrint(FlxG.random.int);
-		var rooms = blue_print.generate_dungen_apartment(40, 40, seed);
+		var rooms = blue_print.generate_dungen_apartment(width, height, seed);
 		
 		edge_left = 0;
 		edge_top = 0;
@@ -72,7 +77,7 @@ class PlayStateDungen extends FlxState
 		collected_laundry = new FlxTypedGroup<Item>();
 		hud.add(collected_laundry);
 
-		apartment = new ApartmentDungen(rooms, 40, 40, grid_size, tasks_to_complete);
+		apartment = new ApartmentDungen(rooms, width, height, grid_size, tasks_to_complete);
 		add(apartment);
 
 
@@ -92,11 +97,11 @@ class PlayStateDungen extends FlxState
 		hud_camera.follow(hud.background, FlxCameraFollowStyle.NO_DEAD_ZONE);
 
 		FlxG.cameras.add(hud_camera);
-		var level_duration_seconds = 30;
 		level_timer = new FlxTimer();
-		level_timer.start(level_duration_seconds, timer -> end_level());
+		level_timer.start(task_list.seconds_allotted, timer -> end_level());
 
-		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, () -> return level_timer.progress * level_duration_seconds, 0, 30);
+		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, 
+			() -> return level_timer.progress * task_list.seconds_allotted,0, 30);
 		level_progress_bar.scrollFactor.set(0, 0);
 		level_progress_bar.cameras = [hud_camera];
 		for (hint_text in apartment.hint_texts.members) {
@@ -109,13 +114,26 @@ class PlayStateDungen extends FlxState
 	function end_level()
 	{
 		trace('level ends!');
-		FlxG.camera.fade(FlxColor.BLACK, 1, false, start_next_level);
+		
+		Progression.is_session_ended = true;
+		
+		if(task_list.is_list_complete()){
+			Progression.completed_session_count++;
+			Progression.completed_session_time = level_timer.progress * task_list.seconds_allotted;
+			FlxG.camera.fade(FlxColor.WHITE, 1, false, start_next_level);
+		}
+		else{
+			var scoreBg = 0xff937d66;
+			var go_to_score_state = ()-> FlxG.switchState(new ScoreState());
+			FlxG.camera.fade(scoreBg, 1, false, go_to_score_state);
+		}
+
 	}
 
 	function start_next_level():Void
 	{
 		var pause_for_thought = new FlxTimer();
-		pause_for_thought.start(0.5, timer -> FlxG.resetState());
+		pause_for_thought.start(0.5, timer -> FlxG.switchState(new PlayStateDungen()));
 	}
 
 	function player_stopped_moving()
@@ -138,13 +156,19 @@ class PlayStateDungen extends FlxState
 		}
 	}
 
+	//// UPDATE 
+
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
-
+		
+		if(Progression.is_session_ended){
+			return;
+		}
+		
 		if(task_list.is_list_complete())
 		{
-			trace('start next session !!!!');
+			end_level();
 		}
 
 		controller.update(FlxG.keys);

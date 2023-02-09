@@ -138,7 +138,7 @@ class ApartmentGenerator
 				is_interior;
 			});
 
-			trace('\n');
+			// trace('\n');
 			var aligned_walls:Array<Wall> = interior_walls.filter(wall ->
 			{
 				var aligns_with_other_wall = false;

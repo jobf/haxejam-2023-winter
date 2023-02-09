@@ -8,10 +8,18 @@ class TaskList
 	var completed_tasks:Array<Location>;
 	var on_task_complete:Map<Location, () -> Void> = [];
 
+	public var seconds_allotted(default, null):Int;
+
 	public function new(tasks_to_complete:Array<Location>)
 	{
 		this.tasks_to_complete = tasks_to_complete;
 		this.completed_tasks = [];
+		var task_time_allowed = 15; // different time allowance per task type
+		#if speedrun
+		task_time_allowed = 2;
+		#end
+
+		seconds_allotted = tasks_to_complete.length * task_time_allowed;
 	}
 
 	public function is_list_complete():Bool
@@ -31,9 +39,7 @@ class TaskList
 
 	public function get_task_on_complete(location:Location):Void->Void
 	{
-		var on_complete = on_task_complete.exists(location)
-			? on_task_complete[location]
-			: () -> return;
+		var on_complete = on_task_complete.exists(location) ? on_task_complete[location] : () -> return;
 
 		return () ->
 		{
@@ -72,4 +78,37 @@ class TaskDetails
 	public var hint_text:String;
 	public var hint_cool_off_text:String = "CANNOT USE AGAIN TOO SOON";
 	public var hint_completed_text:String = "TASK COMPLETE !";
+}
+
+class Progression
+{
+	public static var is_session_ended:Bool;
+	public static var completed_session_count:Int;
+	public static var completed_session_time:Float;
+
+	public static function reset(is_hard_reset:Bool = false)
+	{
+		if (is_hard_reset)
+		{
+			completed_session_count = 0;
+			completed_session_time = 0;
+		}
+
+		is_session_ended = false;
+	}
+
+	public static function get_tasks():Array<Location>
+	{
+		if(completed_session_count > 1){
+			return [BASKET, LAVATORY];
+		}
+
+		// etc . . . 
+		// if(completed_session_count > 3){
+		// 	return [BASKET, LAVATORY, FISH];
+		// }
+
+
+		return [BASKET];
+	}
 }

@@ -108,9 +108,7 @@ class Apartment extends FlxGroup
 			y: Std.int(placement.y_pixel - toilet_center),
 			size: task_size,
 			color: get_color(placement.location),
-			task_duration_seconds: get_task_duration(placement.location), 
-			task_cooloff_seconds: get_task_cool_off(placement.location), // only let it happen once per session
-			hint: get_task_hint_message(placement.location),
+
 		}, placement);
 		tasks.add(task);
 		add(task.progress_meter);

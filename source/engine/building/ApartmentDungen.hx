@@ -48,8 +48,8 @@ class ApartmentDungen extends FlxGroup
 		// draw walls
 		for (i => r in all_rooms)
 		{
-			trace('\n $i room ${r.walls.w} x ${r.walls.h}');
-			trace('$i  has ${r.interior_walls.length} internal walls');
+			// trace('\n $i room ${r.walls.w} x ${r.walls.h}');
+			// trace('$i  has ${r.interior_walls.length} internal walls');
 
 			interior_walls.draw_rectangle(r.walls, i + '', 0, 0);
 			var wall_symbol = i + '';
@@ -75,7 +75,7 @@ class ApartmentDungen extends FlxGroup
 					y: y_center
 				}
 
-				trace('room $i door center ${center.x} ${center.y}');
+				// trace('room $i door center ${center.x} ${center.y}');
 
 				var door_center = Std.int(door_width / 2);
 				var door_symbol = "+";

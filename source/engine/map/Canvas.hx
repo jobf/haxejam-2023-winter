@@ -125,7 +125,7 @@ class AsciiCanvas extends GridLogic
 			cleaned = StringTools.replace(cleaned, "+", "0");
 			cleaned = StringTools.replace(cleaned, "o", "0");
 			stringbuffer.add(cleaned + '\n');
-			trace(cleaned);
+			// trace(cleaned);
 		}
 
 		return stringbuffer.toString();

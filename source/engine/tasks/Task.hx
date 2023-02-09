@@ -72,15 +72,15 @@ class Task extends FlxSprite
 			if (task_remaining_seconds <= 0)
 			{
 				on_task_complete();
-				trace('is cooling off');
+				// trace('is cooling off');
 				is_cooling_off = true;
 				if(config.details.is_repeatable){
-					trace('starting cool off timer');
+					// trace('starting cool off timer');
 					// cool off before resetting to allow repeat
 					timer.start(config.details.task_cooloff_seconds, timer -> {
 						task_remaining_seconds = config.details.task_duration_seconds;
 						is_cooling_off = false;
-						trace('cool off complete');
+						// trace('cool off complete');
 					});
 				}
 				else{
