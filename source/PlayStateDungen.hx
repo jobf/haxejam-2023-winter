@@ -2,7 +2,7 @@ package;
 
 import engine.actor.Actor;
 import engine.actor.Controller;
-import engine.building.Apartment;
+import engine.building.ApartmentDungen;
 import engine.building.Layout;
 import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint;
@@ -17,7 +17,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-class PlayState extends FlxState
+class PlayStateDungen extends FlxState
 {
 	var controller:Controller;
 	var edge_left:Int;
@@ -33,7 +33,7 @@ class PlayState extends FlxState
 	var camera_zoom_tween:FlxTween;
 	var zoom_out_max:Float = 0.72;
 	var zoom_increment:Float = 0.002;
-	var apartment:Apartment;
+	var apartment:ApartmentDungen;
 	var collected_items:Array<Item> = [];
 	var collection_size:Int = 16;
 	var collection_size_gap:Int = 10;
@@ -52,18 +52,19 @@ class PlayState extends FlxState
 		hud = new Hud();
 		add(hud);
 
+		var seed = -1;
+		// var seed = 5117;
 		var blue_print = new BluePrint(FlxG.random.int);
+		var rooms = blue_print.generate_dungen_apartment(40, 40, seed);
 		
-		var floor_plan = blue_print.generate_floor_plan();
-
-		edge_left = 40;
-		edge_top = 40;
+		edge_left = 0;
+		edge_top = 0;
 		grid_size = 32;
 
 		collected_laundry = new FlxTypedGroup<Item>();
 		hud.add(collected_laundry);
 
-		apartment = new Apartment(floor_plan, edge_left, edge_top, grid_size);
+		apartment = new ApartmentDungen(rooms, 40,40, grid_size);
 		add(apartment);
 
 		task_complete[BASKET] = deposit_collected_items;
@@ -147,8 +148,8 @@ class PlayState extends FlxState
 			FlxG.resetState();
 		}
 
-		// stop running through walls
-		FlxG.collide(apartment.player, apartment.walls);
+		@:privateAccess
+		FlxG.collide(apartment.map_auto, apartment.player);
 		
 		// interact with items
 		FlxG.overlap(apartment.laundry, apartment.player, overlap_laundry_with_player);

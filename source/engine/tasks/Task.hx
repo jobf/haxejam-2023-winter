@@ -11,13 +11,14 @@ import flixel.util.FlxTimer;
 @:structInit
 class TaskConfig
 {
-	public var help:String = "";
+	public var hint:String = "";
 	public var x:Int;
 	public var y:Int;
 	public var color:FlxColor;
 	public var size:Int = 48;
 	public var task_duration_seconds:Float;
 	public var task_cooloff_seconds:Float;
+	public var is_repeatable:Bool = false;
 }
 
 class Task extends FlxSprite
@@ -30,7 +31,11 @@ class Task extends FlxSprite
 	var is_cooling_off:Bool;
 	public var progress_meter:CallbackFlxBar;
 	public var placement:Placement;
-	public var help:FlxBitmapText;
+	public var hint:FlxBitmapText;
+	var timer_hint:FlxTimer;
+	var hint_visible_duration:Float = 2.0;
+	var is_hint_available:Bool;
+
 
 	
 	public function new(config:TaskConfig, placement:Placement)
@@ -43,37 +48,45 @@ class Task extends FlxSprite
 		task_remaining_seconds = config.task_duration_seconds;
 		is_cooling_off = false;
 		timer = new FlxTimer();
+		timer_hint = new FlxTimer();
 		progress_meter = new CallbackFlxBar(x + config.size + 4, y, BOTTOM_TO_TOP, 20, 30, () -> get_progress(), 0, get_duration());
-		help = new FlxBitmapText(Fonts.normal());
-		help.text = config.help;
-		help.screenCenter();
-		help.y -= 130;
-		help.visible = false;
-		help.scrollFactor.set(0,0);
+		hint = new FlxBitmapText(Fonts.normal());
+		hint.text = config.hint;
+		hint.screenCenter();
+		hint.y -= 130;
+		hint.visible = false;
+		hint.scrollFactor.set(0,0);
 		trace('init task : $x $y');
 	}
 
 	public function decrease_task_remaining(seconds:Float, on_task_complete:() -> Void)
 	{
 		if(is_cooling_off){
-			help.visible = false;
+			// hint.visible = false;
 			return;
 		}
 		
 		if (task_remaining_seconds > 0)
 		{
-			help.visible = true;
+			// hint.visible = true;
 			task_remaining_seconds -= seconds;
 			if (task_remaining_seconds <= 0)
 			{
 				on_task_complete();
+				trace('is cooling off');
 				is_cooling_off = true;
-				// cooloff_remaining_seconds = config.task_cooloff_seconds;
-				timer.start(config.task_cooloff_seconds, timer -> {
-					task_remaining_seconds = config.task_duration_seconds;
-					is_cooling_off = false;
-					trace('cool off complete');
-				});
+				if(config.is_repeatable){
+					trace('starting cool off timer');
+					// cool off before resetting to allow repeat
+					timer.start(config.task_cooloff_seconds, timer -> {
+						task_remaining_seconds = config.task_duration_seconds;
+						is_cooling_off = false;
+						trace('cool off complete');
+					});
+				}
+				else{
+					is_hint_available = false;
+				}
 			}
 		}
 	}
@@ -87,5 +100,14 @@ class Task extends FlxSprite
 	inline function get_duration():Float
 	{
 		return config.task_duration_seconds;
+	}
+
+	public function show_hint() {
+		// var can_show_hint = config.is_repeatable || tim
+		// if(config.is_repeatable)
+		hint.visible = true;
+		timer_hint.start(hint_visible_duration, timer -> {
+			hint.visible = false;
+		});
 	}
 }

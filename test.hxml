@@ -1,0 +1,9 @@
+-cp source
+-cp test
+-cp .submodules/dungen/src
+-cp .submodules/ds/src
+-cp .submodules/interop/src
+-cp .submodules/seedyrng/src
+-lib utest
+-main test.RunTests
+--interp

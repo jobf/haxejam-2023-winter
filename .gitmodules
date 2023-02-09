@@ -1,0 +1,12 @@
+[submodule ".submodules/dungen"]
+	path = .submodules/dungen
+	url = https://github.com/dropecho/dungen.git
+[submodule ".submodules/interop"]
+	path = .submodules/interop
+	url = https://github.com/dropecho/interop.git
+[submodule ".submodules/ds"]
+	path = .submodules/ds
+	url = https://github.com/dropecho/ds.git
+[submodule ".submodules/seedyrng"]
+	path = .submodules/seedyrng
+	url = https://github.com/chfoo/seedyrng.git

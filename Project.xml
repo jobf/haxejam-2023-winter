@@ -31,6 +31,10 @@
 
 	<set name="BUILD_DIR" value="export" />
 	<source path="source" />
+	<source path=".submodules/dungen/src" />
+	<source path=".submodules/ds/src" />
+	<source path=".submodules/interop/src" />
+	<source path=".submodules/seedyrng/src" />
 	<assets path="assets" />
 
 	<!-- _______________________________ Libraries ______________________________ -->

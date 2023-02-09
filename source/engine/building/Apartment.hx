@@ -16,7 +16,7 @@ class Apartment extends FlxGroup
 	public var tasks(default, null):FlxTypedGroup<Task>;
 	public var walls(default, null):FlxTypedGroup<Wall>;
 	public var laundry(default, null):FlxTypedGroup<Item>;
-	public var help_texts(default, null):FlxGroup;
+	public var hint_texts(default, null):FlxGroup;
 	
 	var empty_spots:Array<Placement>;
 	var edge_left:Int;
@@ -40,7 +40,7 @@ class Apartment extends FlxGroup
 		laundry = new FlxTypedGroup<Item>();
 		add(laundry);
 
-		help_texts = new FlxGroup();
+		hint_texts = new FlxGroup();
 
 
 		empty_spots = [];
@@ -110,15 +110,15 @@ class Apartment extends FlxGroup
 			color: get_color(placement.location),
 			task_duration_seconds: get_task_duration(placement.location), 
 			task_cooloff_seconds: get_task_cool_off(placement.location), // only let it happen once per session
-			help: get_task_help_message(placement.location),
+			hint: get_task_hint_message(placement.location),
 		}, placement);
 		tasks.add(task);
 		add(task.progress_meter);
 		task_list[placement.location] = task;
-		help_texts.add(task.help);
+		hint_texts.add(task.hint);
 	}
 
-	function get_task_help_message(location:Location):String {
+	function get_task_hint_message(location:Location):String {
 		return switch location {
 			case BASKET: "BRING ME CLOTHES !";
 			case LAVATORY: "STAY WITH ME !";
