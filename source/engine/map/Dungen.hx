@@ -20,7 +20,7 @@ class ApartmentGenerator
 			WC,
 			BATH,
 			WASH,
-			BED
+			BEDROOM
 		];
 		
 		var found_player = false;
@@ -226,7 +226,7 @@ class Furniture{
 		EMPTY => [
 			rug
 		],
-		BED => [
+		BEDROOM => [
 			bed
 		],
 	];

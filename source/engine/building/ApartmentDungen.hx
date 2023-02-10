@@ -39,13 +39,12 @@ class ApartmentDungen extends FlxGroup
 
 		task_zones = new FlxTypedGroup<TaskZone>();
 		add(task_zones);
-		
+
 		tasks = new FlxTypedGroup<Task>();
 		add(tasks);
 
 		laundry = new FlxTypedGroup<Item>();
 		add(laundry);
-
 
 		hint_texts = new FlxGroup();
 
@@ -58,8 +57,10 @@ class ApartmentDungen extends FlxGroup
 		var small_rooms = config.rooms.splice(0, 3);
 		var large_rooms = config.rooms.splice(config.rooms.length - 1, config.rooms.length);
 		var all_rooms = small_rooms.concat(large_rooms);
-		var task_zone_lookup: Map<Room, TaskZone> = [];
-		
+		var task_zone_lookup:Map<Room, TaskZone> = [];
+		large_rooms[0].room = BEDROOM;
+		var unassigned_rooms = config.rooms.filter(space -> space.room == EMPTY);
+
 		// draw walls
 		for (i => r in all_rooms)
 		{
@@ -76,14 +77,14 @@ class ApartmentDungen extends FlxGroup
 			}
 		}
 
-		// set up rest of room 
+		// set up rest of room
 		for (i => r in all_rooms)
 		{
 			var x_task_zone = Std.int(r.task_zone.x * grid_size);
 			var y_task_zone = Std.int(r.task_zone.y * grid_size);
 			var w_task_zone = Std.int(r.task_zone.w * grid_size);
 			var h_task_zone = Std.int(r.task_zone.h * grid_size);
-			
+
 			trace('make zone hotspot room ${r.room} $x_task_zone , $y_task_zone  $w_task_zone x $h_task_zone');
 
 			var tazk_zone_color = switch r.room
@@ -92,7 +93,7 @@ class ApartmentDungen extends FlxGroup
 				case BATH: FlxColor.CYAN;
 				case WASH: FlxColor.LIME;
 				case WC: FlxColor.BROWN;
-				case BED: FlxColor.PURPLE;
+				case BEDROOM: FlxColor.PURPLE;
 				case KITCHEN: FlxColor.GRAY;
 				case _: FlxColor.BLACK;
 			}
@@ -117,7 +118,7 @@ class ApartmentDungen extends FlxGroup
 				var height = w.y_start + w.y_end;
 				var x_center = Std.int(width / 2);
 				var y_center = Std.int(height / 2);
-				
+
 				var center:Int2 = {
 					x: x_center,
 					y: y_center
@@ -157,8 +158,6 @@ class ApartmentDungen extends FlxGroup
 
 				apartment_canvas.draw_line(x_start, y_start, x_end, y_end, door_symbol);
 			}
-
-			
 		}
 
 		var external:Rectangle = {
@@ -176,34 +175,65 @@ class ApartmentDungen extends FlxGroup
 		map_auto.loadMapFromCSV(csv, "assets/images/auto-tiles-32-debug.png", grid_size, grid_size, FlxTilemapAutoTiling.AUTO);
 		add(map_auto);
 
-
 		// x_pixel y_pixel for player here are actually x_grid and y_grid -_-
 		apartment_canvas.set_cell(config.player.x_pixel, config.player.x_pixel, "@");
 
-		config.player.x_pixel *=  grid_size;
-		config.player.y_pixel *=  grid_size;
+		config.player.x_pixel *= grid_size;
+		config.player.y_pixel *= grid_size;
 		place_player(config.player);
 
 		for (location in tasks_to_complete)
 		{
-			var task_details = TaskData.configurations[location];
-			if(task_zone_lookup.exists(task_details.room)){
+			if (location == RUG)
+			{
+				// todo handle this better
+				if (TaskData.configurations.exists(RUG))
+				{
+					var rug_room = unassigned_rooms[1];
+					var x_rug_grid = Std.int((rug_room.task_zone.w / 2) + rug_room.task_zone.x);
+					var y_rug_grid = Std.int((rug_room.task_zone.h / 2) + rug_room.task_zone.y);
+
+					var rug_placement:Placement = {
+						y_pixel: y_rug_grid * grid_size,
+						x_pixel: x_rug_grid * grid_size,
+						location: RUG
+					}
+
+					place_task(rug_placement, TaskData.configurations[RUG]);
+				}
+			}
+			else{
+				var is_task_configured = TaskData.configurations.exists(location);
+	
+				if (!is_task_configured)
+				{
+					trace('!!! WARNING no task configured for $location');
+					continue;
+				}
+	
+				var task_details = TaskData.configurations[location];
+	
+				var is_task_placement_arranged = task_zone_lookup.exists(task_details.room);
+	
+				if (!is_task_placement_arranged)
+				{
+					trace('!!! WARNING no placement configured for $location');
+					continue;
+				}
+	
 				var zone = task_zone_lookup[task_details.room];
 				var placement:Placement = {
-								x_pixel: Std.int(zone.width / 2 + zone.x),
-								y_pixel: Std.int(zone.height / 2 + zone.y),
-								location: location
-							}
+					x_pixel: Std.int(zone.width / 2 + zone.x),
+					y_pixel: Std.int(zone.height / 2 + zone.y),
+					location: location
+				}
 				place_task(placement, task_details);
 			}
-			else
-			{
-				trace('!!! WARNING no placement configured for $location');
-			}
+
 		}
 
 		empty_spots = apartment_canvas.get_empty_spaces(grid_size);
-		
+
 		// shuffle the empty spots before distributing items
 		FlxG.random.shuffle(empty_spots);
 
@@ -242,8 +272,8 @@ class ApartmentDungen extends FlxGroup
 		// var task_size = 48;
 		// var task_center = task_size / 2;
 		var task = new Task({
-			x: placement.x_pixel,//Std.int(placement.x_pixel - task_center),
-			y: placement.y_pixel,//Std.int(placement.y_pixel - task_center),
+			x: placement.x_pixel, // Std.int(placement.x_pixel - task_center),
+			y: placement.y_pixel, // Std.int(placement.y_pixel - task_center),
 			color: get_color(placement.location),
 			details: details
 		}, placement);
@@ -255,6 +285,7 @@ class ApartmentDungen extends FlxGroup
 	}
 
 	var laundry_frames:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+
 	function place_dirty_laundry(spot:Placement)
 	{
 		var item = new Item({
@@ -264,8 +295,8 @@ class ApartmentDungen extends FlxGroup
 			color: 0xFFf3edc6,
 			asset_path: "assets/images/items-32.png"
 		});
-		
-		var random_laundry_item_index:Int  = FlxG.random.int(0, laundry_frames.length - 1);
+
+		var random_laundry_item_index:Int = FlxG.random.int(0, laundry_frames.length - 1);
 		item.animation.frameIndex = laundry_frames[random_laundry_item_index];
 		laundry.add(item);
 	}

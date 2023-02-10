@@ -82,7 +82,7 @@ class TaskData
 		BED => {
 			frame_index: 0,
 			frame_index_complete: 8,
-			room:BED,
+			room:BEDROOM,
 			task_duration_seconds: 3.0,
 			is_repeatable: false,
 		}
@@ -124,16 +124,24 @@ class Progression
 
 	public static function get_tasks():Array<Location>
 	{
+		var tasks =  [BASKET];
+
+		#if alltasks
+		completed_session_count = 999;
+		#end
+
 		if(completed_session_count > 1){
-			return [BASKET, LAVATORY];
+			tasks.push(LAVATORY);
 		}
 
-		// etc . . . 
-		// if(completed_session_count > 3){
-		// 	return [BASKET, LAVATORY, FISH];
-		// }
+		if(completed_session_count > 3){
+			tasks.push(BED);
+		}
 
+		if(completed_session_count >= 5){
+			tasks.push(RUG);
+		}
 
-		return [BASKET];
+		return tasks;
 	}
 }
