@@ -86,7 +86,10 @@ class PlayState extends FlxState
 		FlxG.cameras.add(hud_camera);
 		var level_duration_seconds = 30;
 		level_timer = new FlxTimer();
-		level_timer.start(level_duration_seconds, timer -> end_level());
+		level_timer.start(level_duration_seconds, timer -> {
+			trace('timer reached end');
+			end_level();
+		});
 
 		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, () -> return level_timer.progress * level_duration_seconds, 0, 30);
 		level_progress_bar.scrollFactor.set(0, 0);

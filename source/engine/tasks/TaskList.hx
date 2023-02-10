@@ -15,7 +15,7 @@ class TaskList
 	{
 		this.tasks_to_complete = tasks_to_complete;
 		this.completed_tasks = [];
-		var task_time_allowed = 15; // different time allowance per task type
+		var task_time_allowed = 7; // different time allowance per task type
 		#if speedrun
 		task_time_allowed = 2;
 		#end
