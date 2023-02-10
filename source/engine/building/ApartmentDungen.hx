@@ -102,7 +102,7 @@ class ApartmentDungen extends FlxGroup
 			task_zones.add(task_zone);
 
 			var x_grid = Std.int(task_zone.x / grid_size);
-			var y_grid = Std.int(task_zone.x / grid_size);
+			var y_grid = Std.int(task_zone.y / grid_size);
 			var x_pixel = Std.int(task_zone.width / 2);
 			var y_pixel = Std.int(task_zone.height / 2);
 			
@@ -262,10 +262,10 @@ class ApartmentDungen extends FlxGroup
 	{
 		trace('set up task ' + placement.location + ' ${placement.x_pixel} , ${placement.y_pixel} ');
 		var task_size = 48;
-		var toilet_center = task_size / 2;
+		var task_center = task_size / 2;
 		var task = new Task({
-			x: Std.int(placement.x_pixel - toilet_center),
-			y: Std.int(placement.y_pixel - toilet_center),
+			x: Std.int(placement.x_pixel - task_center),
+			y: Std.int(placement.y_pixel - task_center),
 			size: task_size,
 			color: get_color(placement.location),
 			details: TaskData.configurations[placement.location]
