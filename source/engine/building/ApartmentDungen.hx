@@ -14,6 +14,7 @@ import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxBaseTilemap;
+import flixel.tile.FlxTileblock;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxColor;
 
@@ -37,6 +38,9 @@ class ApartmentDungen extends FlxGroup
 	{
 		super();
 
+		var floor_map = new FlxTilemap();
+		add(floor_map);
+		
 		task_zones = new FlxTypedGroup<TaskZone>();
 		add(task_zones);
 
@@ -166,6 +170,18 @@ class ApartmentDungen extends FlxGroup
 			w: w - 1,
 			h: h - 1
 		}
+
+		var floor_canvas = new AsciiCanvas(w, h);
+		
+		// todo - finish kitchen tiles once that area is defined
+		if (task_zone_lookup.exists(KITCHEN))
+		{
+			var kitchen = task_zone_lookup[KITCHEN];
+			// fill kitchen tiles
+			// floor_canvas.draw_rectangle()
+		}
+		floor_map.loadMapFromCSV(floor_canvas.csv("1"), "assets/images/carpet-00.png", 32, 32);
+
 		apartment_canvas.draw_rectangle(external, "#", 0, 0);
 
 		map_auto = new FlxTilemap();
@@ -202,25 +218,26 @@ class ApartmentDungen extends FlxGroup
 					place_task(rug_placement, TaskData.configurations[RUG]);
 				}
 			}
-			else{
+			else
+			{
 				var is_task_configured = TaskData.configurations.exists(location);
-	
+
 				if (!is_task_configured)
 				{
 					trace('!!! WARNING no task configured for $location');
 					continue;
 				}
-	
+
 				var task_details = TaskData.configurations[location];
-	
+
 				var is_task_placement_arranged = task_zone_lookup.exists(task_details.room);
-	
+
 				if (!is_task_placement_arranged)
 				{
 					trace('!!! WARNING no placement configured for $location');
 					continue;
 				}
-	
+
 				var zone = task_zone_lookup[task_details.room];
 				var placement:Placement = {
 					x_pixel: Std.int(zone.width / 2 + zone.x),
@@ -229,7 +246,6 @@ class ApartmentDungen extends FlxGroup
 				}
 				place_task(placement, task_details);
 			}
-
 		}
 
 		empty_spots = apartment_canvas.get_empty_spaces(grid_size);

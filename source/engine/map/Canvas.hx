@@ -111,7 +111,7 @@ class AsciiCanvas extends GridLogic
 		}
 	}
 
-	public function csv() :String
+	public function csv(empty_tile:String="0") :String
 	{
 		var stringbuffer = new StringBuf();
 		for (r in 0...numRows)
@@ -119,16 +119,16 @@ class AsciiCanvas extends GridLogic
 			var start = r * numColumns;
 			var end = start + numColumns;
 			var line = cells.slice(start, end).join(",");
-			var cleaned = StringTools.replace(line, ".", "0");
+			var cleaned = StringTools.replace(line, ".", empty_tile);
 
 			// todo - this is dirty, clean it up
-			cleaned = StringTools.replace(cleaned, "B", "0");
-			cleaned = StringTools.replace(cleaned, "L", "0");
-
+			cleaned = StringTools.replace(cleaned, "B", empty_tile);
+			cleaned = StringTools.replace(cleaned, "L", empty_tile);
+			
 			cleaned = StringTools.replace(cleaned, "##", "#");
 			cleaned = StringTools.replace(cleaned, "#", "1");
-			cleaned = StringTools.replace(cleaned, "+", "0");
-			cleaned = StringTools.replace(cleaned, "o", "0");
+			cleaned = StringTools.replace(cleaned, "+", empty_tile);
+			cleaned = StringTools.replace(cleaned, "o", empty_tile);
 			stringbuffer.add(cleaned + '\n');
 			// trace(cleaned);
 		}
