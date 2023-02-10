@@ -2,6 +2,8 @@ package engine.tasks;
 
 import engine.building.Layout;
 import engine.flx.CallbackFlxBar;
+import engine.map.BluePrint.Rectangle;
+import engine.map.Data;
 import engine.tasks.TaskList.TaskDetails;
 import engine.ui.Fonts;
 import flixel.FlxSprite;
@@ -19,6 +21,26 @@ class TaskConfig
 	public var details:Null<TaskDetails> = null;
 }
 
+@:structInit
+class TaskZoneConfig{
+	public var x_pixel:Int;
+	public var y_pixel:Int;
+	public var w_pixel:Int;
+	public var h_pixel:Int;
+	public var rect:Rectangle;
+	public var room:Room;
+	public var color:FlxColor;
+}
+
+class TaskZone extends  FlxSprite{
+	public var config(default, null):TaskZoneConfig;
+
+	public function new(config:TaskZoneConfig){
+		super(config.x_pixel, config.y_pixel);
+		this.config = config;
+		makeGraphic(config.w_pixel, config.h_pixel, config.color, true);
+	}
+}
 
 class Task extends FlxSprite
 {

@@ -6,16 +6,16 @@ import dropecho.ds.algos.PostOrderTraversal;
 import dropecho.dungen.bsp.BSPData;
 import dropecho.dungen.generators.RoomGenerator;
 import dropecho.interop.Extender;
+import engine.building.Layout;
 import engine.map.BluePrint;
 import engine.map.Canvas;
-import engine.map.Data.Room;
-import engine.map.Data.RoomShape;
+import engine.map.Data;
 
 using dropecho.dungen.Map2d;
 
 class ApartmentGenerator
 {
-	public static function buildRooms(tree:BSPTree<BSPData>, rooms:Array<RoomSpace>, edges:Perimeter, ?opts:Dynamic = null):Map2d
+	public static function buildRooms(tree:BSPTree<BSPData>, rooms:Array<RoomSpace>, edges:Perimeter, player_placement:Placement, ?opts:Dynamic = null):Map2d
 	{
 		var room_order:Array<Room> = [
 			WC,
@@ -23,6 +23,8 @@ class ApartmentGenerator
 			WASH,
 			BED
 		];
+		
+		var found_player = false;
 		
 		var found_rooms:Array<Room> = [];
 		
@@ -62,6 +64,7 @@ class ApartmentGenerator
 					map.set(x, y, params.tileFloor);
 				}
 			}
+			
 			var walls_rect:Rectangle = {
 				w: 0,
 				h: 0
@@ -171,6 +174,19 @@ class ApartmentGenerator
 
 			var is_all_rooms_found = found_rooms.length == room_order.length;
 			var room_found = is_all_rooms_found ? EMPTY : room_order[found_rooms.length];
+			if(room_found == null){
+				room_found = EMPTY;
+			}
+
+			if(room_found == EMPTY && !found_player){
+				var x_player = Std.int((walls_rect.w / 2) + walls_rect.x);
+				var y_player = Std.int((walls_rect.h / 2) + walls_rect.y);
+				player_placement.x_pixel = x_player;
+				player_placement.y_pixel = y_player;
+				found_player = true;
+				trace(' player located $x_player $y_player');
+			}
+
 			found_rooms.push(room_found);
 			
 			rooms.push({
@@ -182,7 +198,7 @@ class ApartmentGenerator
 				interior_walls: interior_walls,
 				aligned_walls: aligned_walls,
 				all_walls: walls,
-				room: room_found == null ? EMPTY : room_found
+				room: room_found
 			});
 
 			return true;

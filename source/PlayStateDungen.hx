@@ -65,19 +65,27 @@ class PlayStateDungen extends FlxState
 
 		var width = 36;
 		var height = 36;
-		var seed = -1; // will use random seed
-		// var seed = 5117; // for testing specific 
-		var blue_print = new BluePrint(FlxG.random.int);
-		var rooms = blue_print.generate_dungen_apartment(width, height, seed);
-		
 		edge_left = 0;
 		edge_top = 0;
 		grid_size = 32;
+		var seed = -1; // will use random seed
+		// var seed = 5117; // for testing specific 
+		var blue_print = new BluePrint(FlxG.random.int);
+		var player_placement:Placement = {
+			y_pixel: 0,
+			x_pixel: 0,
+			location: PLAYER
+		}
+		var rooms = blue_print.generate_dungen_apartment(width, height, player_placement, seed);
+		// filthy
+		player_placement.x_pixel *= grid_size;
+		player_placement.y_pixel *= grid_size;
+		
 
 		collected_laundry = new FlxTypedGroup<Item>();
 		hud.add(collected_laundry);
 
-		apartment = new ApartmentDungen(rooms, width, height, grid_size, tasks_to_complete);
+		apartment = new ApartmentDungen(rooms, width, height, grid_size, tasks_to_complete, player_placement);
 		add(apartment);
 
 		FlxG.camera.follow(apartment.player);

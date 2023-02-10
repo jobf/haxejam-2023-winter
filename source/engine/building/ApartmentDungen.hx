@@ -1,20 +1,18 @@
 package engine.building;
 
 import engine.actor.Actor;
-import engine.building.Layout.Location;
-import engine.building.Layout.Placement;
-import engine.map.BluePrint.RoomSpace;
+import engine.building.Layout;
 import engine.map.BluePrint;
 import engine.map.Canvas.AsciiCanvas;
-import engine.map.Data.FloorPlan;
 import engine.map.Data;
 import engine.tasks.Item;
 import engine.tasks.Task;
-import engine.tasks.TaskList.TaskData;
-import engine.tasks.TaskList.TaskDetails;
+import engine.tasks.TaskList;
 import flixel.FlxG;
+import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
+import flixel.math.FlxPoint;
 import flixel.tile.FlxBaseTilemap;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxColor;
@@ -23,7 +21,7 @@ class ApartmentDungen extends FlxGroup
 {
 	public var player(default, null):Actor;
 	public var tasks(default, null):FlxTypedGroup<Task>;
-	public var task_zones(default, null):FlxTypedGroup<FlxSprite>;
+	public var task_zones(default, null):FlxTypedGroup<TaskZone>;
 	public var laundry(default, null):FlxTypedGroup<Item>;
 	public var hint_texts(default, null):FlxGroup;
 
@@ -35,11 +33,11 @@ class ApartmentDungen extends FlxGroup
 	var rng:RandomInt;
 	var map_auto(default, null):FlxTilemap;
 
-	public function new(rooms:Array<RoomSpace>, w:Int, h:Int, grid_size:Int, tasks_to_complete:Array<Location>)
+	public function new(rooms:Array<RoomSpace>, w:Int, h:Int, grid_size:Int, tasks_to_complete:Array<Location>, player_placement:Placement)
 	{
 		super();
 
-		task_zones = new FlxTypedGroup<FlxSprite>();
+		task_zones = new FlxTypedGroup<TaskZone>();
 		add(task_zones);
 		
 		tasks = new FlxTypedGroup<Task>();
@@ -60,7 +58,7 @@ class ApartmentDungen extends FlxGroup
 		var small_rooms = rooms.splice(0, 3);
 		var large_rooms = rooms.splice(rooms.length - 1, rooms.length);
 		var all_rooms = small_rooms.concat(large_rooms);
-		var task_zone_lookup: Map<Room, FlxSprite> = [];
+		var task_zone_lookup: Map<Room, TaskZone> = [];
 		
 		// draw walls
 		for (i => r in all_rooms)
@@ -79,7 +77,6 @@ class ApartmentDungen extends FlxGroup
 		}
 
 		// set up rest of room 
-		var task_placements:Map<Location, Placement> = [];
 		for (i => r in all_rooms)
 		{
 			var x_task_zone = Std.int(r.task_zone.x * grid_size);
@@ -89,7 +86,6 @@ class ApartmentDungen extends FlxGroup
 			
 			trace('make zone hotspot room ${r.room} $x_task_zone , $y_task_zone  $w_task_zone x $h_task_zone');
 
-			var task_zone = new FlxSprite(x_task_zone, y_task_zone);
 			var tazk_zone_color = switch r.room
 			{
 				// case EMPTY:
@@ -101,7 +97,17 @@ class ApartmentDungen extends FlxGroup
 				case _: FlxColor.BLACK;
 			}
 			tazk_zone_color.alpha = 40;
-			task_zone.makeGraphic(w_task_zone, h_task_zone, tazk_zone_color);
+
+			var zone_config:TaskZoneConfig = {
+				x_pixel: x_task_zone,
+				y_pixel: y_task_zone,
+				w_pixel: w_task_zone,
+				h_pixel: h_task_zone,
+				room: r.room,
+				rect: r.task_zone,
+				color: tazk_zone_color
+			}
+			var task_zone = new TaskZone(zone_config);
 			task_zones.add(task_zone);
 			task_zone_lookup[r.room] = task_zone;
 
@@ -169,17 +175,17 @@ class ApartmentDungen extends FlxGroup
 		map_auto.loadMapFromCSV(csv, "assets/images/auto-tiles-32-debug.png", grid_size, grid_size, FlxTilemapAutoTiling.AUTO);
 		add(map_auto);
 
-		var player_placement:Placement = {
-			y_pixel: 64,
-			x_pixel: 64,
-			location: PLAYER
-		}
+		// var player_placement:Placement = {
+		// 	y_pixel: 64,
+		// 	x_pixel: 64,
+		// 	location: PLAYER
+		// }
 
 		place_player(player_placement);
 		var x_grid_player = Std.int(player_placement.x_pixel / grid_size);
 		var y_grid_player = Std.int(player_placement.y_pixel / grid_size);
 		// todo - get player position from grid (outsize of all task zone)
-		// instead of setting here
+		// instead of setting here ???
 		interior_walls.set_cell(x_grid_player, y_grid_player, "@");
 
 		for (location in tasks_to_complete)
@@ -201,6 +207,16 @@ class ApartmentDungen extends FlxGroup
 		}
 
 		empty_spots = interior_walls.get_empty_spaces(grid_size);
+		
+		var is_player_placed = false;
+		var empty_spot_index = 0;
+		// while(!is_player_placed){
+		// 	var empty_spot = empty_spots[empty_spot_index];
+		// 	for (zone in task_zones.members) {
+				
+		// 	}
+		// 	empty_spot_index++;
+		// }
 
 		// shuffle the empty spots before distributing items
 		FlxG.random.shuffle(empty_spots);

@@ -1,9 +1,10 @@
 package engine.map;
 
 import dropecho.dungen.bsp.Generator;
+import engine.building.Layout;
 import engine.map.Canvas;
 import engine.map.Data;
-import engine.map.Dungen.ApartmentGenerator;
+import engine.map.Dungen;
 
 class BluePrint
 {
@@ -55,7 +56,7 @@ class BluePrint
 		}
 	}
 
-	public function generate_dungen_apartment(width:Int, height:Int, seed_:Int = -1):Array<RoomSpace>
+	public function generate_dungen_apartment(width:Int, height:Int, player_placement:Placement, seed_:Int = -1):Array<RoomSpace>
 	{
 		var seed = seed_ < 0 ? rng(0, 9999) : seed_;
 
@@ -76,12 +77,15 @@ class BluePrint
 			right: width,
 			top: 0,
 			bottom: height,
-		}, {
+		},
+		player_placement,
+		{
 			tileCorridor: 3,
 			tileFloor: 2,
 			tileWall: 0,
 			padding: 0
-		});
+		}
+		);
 
 		return rooms;
 	}
