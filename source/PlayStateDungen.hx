@@ -33,7 +33,7 @@ class PlayStateDungen extends FlxState
 	var is_player_moving:Bool = false;
 	var camera_zoom_tween:FlxTween;
 	var zoom_out_max:Float = 0.72;
-	var zoom_increment:Float = 0.002;
+	var zoom_increment:Float = 0.005;
 	var apartment:ApartmentDungen;
 	var collected_items:Array<Item> = [];
 	var collection_size:Int = 16;
