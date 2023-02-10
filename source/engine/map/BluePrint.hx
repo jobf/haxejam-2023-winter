@@ -56,7 +56,7 @@ class BluePrint
 		}
 	}
 
-	public function generate_dungen_apartment(width:Int, height:Int, player_placement:Placement, seed_:Int = -1):Array<RoomSpace>
+	public function generate_dungen_apartment(width:Int, height:Int, seed_:Int = -1):ApartmentConfig
 	{
 		var seed = seed_ < 0 ? rng(0, 9999) : seed_;
 
@@ -70,24 +70,31 @@ class BluePrint
 			seed: seed + ''
 		}).generate();
 
-		var rooms:Array<RoomSpace> = [];
 
-		var map = ApartmentGenerator.buildRooms(bsp, rooms, {
-			left: 0,
-			right: width,
-			top: 0,
-			bottom: height,
-		},
-		player_placement,
-		{
+		var config:ApartmentConfig = {
+			rooms: [],
+			player: {
+				y_pixel: 0,
+				x_pixel: 0,
+				location: PLAYER
+			},
+			edges: {
+				left: 0,
+				right: width,
+				top: 0,
+				bottom: height,
+			}
+		}
+		// var rooms:Array<RoomSpace> = [];
+		// var 
+		var map = ApartmentGenerator.buildRooms(bsp, config, {
 			tileCorridor: 3,
 			tileFloor: 2,
 			tileWall: 0,
 			padding: 0
-		}
-		);
+		});
 
-		return rooms;
+		return config;
 	}
 }
 
@@ -228,4 +235,14 @@ class Perimeter
 	public var right:Int;
 	public var top:Int;
 	public var bottom:Int;
+}
+
+/**
+	NB all on grid coords
+**/
+@:structInit
+class ApartmentConfig{
+	public var rooms: Array<RoomSpace>;
+	public var player:Placement;
+	public var edges:Perimeter;
 }

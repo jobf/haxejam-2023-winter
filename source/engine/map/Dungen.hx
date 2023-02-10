@@ -15,7 +15,7 @@ using dropecho.dungen.Map2d;
 
 class ApartmentGenerator
 {
-	public static function buildRooms(tree:BSPTree<BSPData>, rooms:Array<RoomSpace>, edges:Perimeter, player_placement:Placement, ?opts:Dynamic = null):Map2d
+	public static function buildRooms(tree:BSPTree<BSPData>, config:ApartmentConfig, ?opts:Dynamic = null):Map2d
 	{
 		var room_order:Array<Room> = [
 			WC,
@@ -140,16 +140,16 @@ class ApartmentGenerator
 				switch wall.edge
 				{
 					case TOP:
-						is_interior = !(top_edge == edges.top);
+						is_interior = !(top_edge == config.edges.top);
 						// trace('is top and interior $is_interior');
 					case BOTTOM:
-						is_interior = !(bottom_edge == edges.bottom);
+						is_interior = !(bottom_edge == config.edges.bottom);
 						// trace('is bottom and interior $is_interior');
 					case RIGHT:
-						is_interior = !(right_edge == edges.right);
+						is_interior = !(right_edge == config.edges.right);
 						// trace('is right and interior $is_interior');
 					case LEFT:
-						is_interior = !(left_edge == edges.left);
+						is_interior = !(left_edge == config.edges.left);
 						// trace('is left and interior $is_interior');
 				}
 				is_interior;
@@ -181,16 +181,16 @@ class ApartmentGenerator
 			if(room_found == EMPTY && !found_player){
 				var x_player = Std.int((walls_rect.w / 2) + walls_rect.x);
 				var y_player = Std.int((walls_rect.h / 2) + walls_rect.y);
-				player_placement.x_pixel = x_player;
-				player_placement.y_pixel = y_player;
+				config.player.x_pixel = x_player;
+				config.player.y_pixel = y_player;
 				found_player = true;
 				trace(' player located $x_player $y_player');
 			}
 
 			found_rooms.push(room_found);
 			
-			rooms.push({
-				index: rooms.length,
+			config.rooms.push({
+				index: config.rooms.length,
 				walls: walls_rect,
 				task_zone: task_rect,
 				door: door,
@@ -222,8 +222,28 @@ class ApartmentGenerator
 	Definitions of furniture sizes at grid level
 **/
 class Furniture{
-	public static var bath:RoomShape  = {
-		long_edge: 6,
-		short_edge: 4
+
+	public static var rooms:Map<Room, Array<RoomShape>> = [
+		EMPTY => [
+			rug
+		],
+		BED => [
+			bed
+		],
+	];
+
+	// public static var bath:RoomShape  = {
+	// 	long_edge: 6,
+	// 	short_edge: 4
+	// }
+
+	public static var bed:RoomShape  = {
+		long_edge: 4,
+		short_edge: 3
+	}
+
+	public static var rug:RoomShape  = {
+		long_edge: 4,
+		short_edge: 3
 	}
 }

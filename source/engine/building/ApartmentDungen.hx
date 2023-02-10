@@ -33,7 +33,7 @@ class ApartmentDungen extends FlxGroup
 	var rng:RandomInt;
 	var map_auto(default, null):FlxTilemap;
 
-	public function new(rooms:Array<RoomSpace>, w:Int, h:Int, grid_size:Int, tasks_to_complete:Array<Location>, player_placement:Placement)
+	public function new(config:ApartmentConfig, w:Int, h:Int, grid_size:Int, tasks_to_complete:Array<Location>)
 	{
 		super();
 
@@ -52,11 +52,11 @@ class ApartmentDungen extends FlxGroup
 		this.grid_size = grid_size;
 		rng = FlxG.random.int;
 
-		var interior_walls = new AsciiCanvas(w, h);
+		var apartment_canvas = new AsciiCanvas(w, h);
 
 		// order of first three ROOM types are set in Dungen
-		var small_rooms = rooms.splice(0, 3);
-		var large_rooms = rooms.splice(rooms.length - 1, rooms.length);
+		var small_rooms = config.rooms.splice(0, 3);
+		var large_rooms = config.rooms.splice(config.rooms.length - 1, config.rooms.length);
 		var all_rooms = small_rooms.concat(large_rooms);
 		var task_zone_lookup: Map<Room, TaskZone> = [];
 		
@@ -64,15 +64,15 @@ class ApartmentDungen extends FlxGroup
 		for (i => r in all_rooms)
 		{
 			// trace('\n $i room ${r.walls.w} x ${r.walls.h}');
-			// trace('$i  has ${r.interior_walls.length} internal walls');
+			// trace('$i  has ${r.apartment_canvas.length} internal walls');
 
-			interior_walls.draw_rectangle(r.walls, i + '', 0, 0);
+			apartment_canvas.draw_rectangle(r.walls, i + '', 0, 0);
 			var wall_symbol = i + '';
 			// var wall_symbol = ",";
 			var wall_symbol = "#";
-			for (w in r.interior_walls)
+			for (w in r.apartment_canvas)
 			{
-				interior_walls.draw_line(w.x_start, w.y_start, w.x_end, w.y_end, wall_symbol);
+				apartment_canvas.draw_line(w.x_start, w.y_start, w.x_end, w.y_end, wall_symbol);
 			}
 		}
 
@@ -117,6 +117,7 @@ class ApartmentDungen extends FlxGroup
 				var height = w.y_start + w.y_end;
 				var x_center = Std.int(width / 2);
 				var y_center = Std.int(height / 2);
+				
 				var center:Int2 = {
 					x: x_center,
 					y: y_center
@@ -154,7 +155,7 @@ class ApartmentDungen extends FlxGroup
 						y_end = center.y + door_center;
 				}
 
-				interior_walls.draw_line(x_start, y_start, x_end, y_end, door_symbol);
+				apartment_canvas.draw_line(x_start, y_start, x_end, y_end, door_symbol);
 			}
 
 			
@@ -166,27 +167,22 @@ class ApartmentDungen extends FlxGroup
 			w: w - 1,
 			h: h - 1
 		}
-		interior_walls.draw_rectangle(external, "#", 0, 0);
+		apartment_canvas.draw_rectangle(external, "#", 0, 0);
 
 		map_auto = new FlxTilemap();
-		var csv = interior_walls.csv();
+		var csv = apartment_canvas.csv();
 		// trace(csv);
 
 		map_auto.loadMapFromCSV(csv, "assets/images/auto-tiles-32-debug.png", grid_size, grid_size, FlxTilemapAutoTiling.AUTO);
 		add(map_auto);
 
-		// var player_placement:Placement = {
-		// 	y_pixel: 64,
-		// 	x_pixel: 64,
-		// 	location: PLAYER
-		// }
 
-		place_player(player_placement);
-		var x_grid_player = Std.int(player_placement.x_pixel / grid_size);
-		var y_grid_player = Std.int(player_placement.y_pixel / grid_size);
-		// todo - get player position from grid (outsize of all task zone)
-		// instead of setting here ???
-		interior_walls.set_cell(x_grid_player, y_grid_player, "@");
+		// x_pixel y_pixel for player here are actually x_grid and y_grid -_-
+		apartment_canvas.set_cell(config.player.x_pixel, config.player.x_pixel, "@");
+
+		config.player.x_pixel *=  grid_size;
+		config.player.y_pixel *=  grid_size;
+		place_player(config.player);
 
 		for (location in tasks_to_complete)
 		{
@@ -206,18 +202,8 @@ class ApartmentDungen extends FlxGroup
 			}
 		}
 
-		empty_spots = interior_walls.get_empty_spaces(grid_size);
+		empty_spots = apartment_canvas.get_empty_spaces(grid_size);
 		
-		var is_player_placed = false;
-		var empty_spot_index = 0;
-		// while(!is_player_placed){
-		// 	var empty_spot = empty_spots[empty_spot_index];
-		// 	for (zone in task_zones.members) {
-				
-		// 	}
-		// 	empty_spot_index++;
-		// }
-
 		// shuffle the empty spots before distributing items
 		FlxG.random.shuffle(empty_spots);
 
