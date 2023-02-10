@@ -21,6 +21,14 @@ class TaskConfig
 }
 
 @:structInit
+class TaskEvents{
+	public var on_setup:Null<Void->Void> = null;
+	public var is_complete:Null<Void->Bool> = null;
+	public var on_complete:Null<Void->Void> = null;
+	public var show_hint:Null<Void->Void> = null;
+}
+
+@:structInit
 class TaskZoneConfig{
 	public var x_pixel:Int;
 	public var y_pixel:Int;
@@ -51,11 +59,8 @@ class Task extends FlxSprite
 	var is_cooling_off:Bool;
 	public var progress_meter:CallbackFlxBar;
 	public var placement:Placement;
-	public var hint:FlxBitmapText;
-	var timer_hint:FlxTimer;
-	var hint_visible_duration:Float = 2.0;
-	var is_hint_available:Bool;
-
+	public var hint(default, null):Hint;
+	var hint_state:HintState;
 
 	
 	public function new(config:TaskConfig, placement:Placement)
@@ -69,14 +74,9 @@ class Task extends FlxSprite
 		task_remaining_seconds = config.details.task_duration_seconds;
 		is_cooling_off = false;
 		timer = new FlxTimer();
-		timer_hint = new FlxTimer();
 		progress_meter = new CallbackFlxBar(x + config.details.frame_size + 4, y, BOTTOM_TO_TOP, 20, 30, () -> get_progress(), 0, get_duration());
-		hint = new FlxBitmapText(Fonts.normal());
-		hint.text = config.details.hint_text;
-		hint.screenCenter();
-		hint.y -= 130;
-		hint.visible = false;
-		hint.scrollFactor.set(0,0);
+		hint = new Hint(config.details);
+		hint_state = READY;
 		trace('init task : $x $y');
 	}
 
@@ -97,17 +97,19 @@ class Task extends FlxSprite
 				animation.frameIndex = config.details.frame_index_complete;
 				// trace('is cooling off');
 				is_cooling_off = true;
+				hint_state = COOLING_OFF;
 				if(config.details.is_repeatable){
 					// trace('starting cool off timer');
 					// cool off before resetting to allow repeat
 					timer.start(config.details.task_cooloff_seconds, timer -> {
 						task_remaining_seconds = config.details.task_duration_seconds;
 						is_cooling_off = false;
+						hint_state = READY;
 						// trace('cool off complete');
 					});
 				}
 				else{
-					is_hint_available = false;
+					hint_state = COMPLETE;
 				}
 			}
 		}
@@ -125,11 +127,69 @@ class Task extends FlxSprite
 	}
 
 	public function show_hint() {
-		// var can_show_hint = config.is_repeatable || tim
-		// if(config.is_repeatable)
-		hint.visible = true;
-		timer_hint.start(hint_visible_duration, timer -> {
-			hint.visible = false;
+		hint.show_hint(hint_state);
+	}
+}
+
+enum HintState{
+	IDLE;
+	READY;
+	COOLING_OFF;
+	COMPLETE;
+}
+
+/*
+	public var hint_text:String = "STAY WITH ME !";
+	public var hint_cool_off_text:String = "CANNOT USE AGAIN TOO SOON";
+	public var hint_completed_text:String = "TASK COMPLETE !";
+*/
+class Hint{
+	var hint_states:Map<HintState, FlxBitmapText>;
+	public var hints:Array<FlxBitmapText>;
+	var task_details:TaskDetails;
+	var timer:FlxTimer;
+	var current_state:HintState;
+
+
+
+	public function new(task_details:TaskDetails){
+		this.task_details = task_details;
+		hint_states = [];
+		hints = [];
+		current_state = IDLE;
+		timer = new FlxTimer();
+		add_hint(task_details.hint_text, READY);
+		add_hint(task_details.hint_cool_off_text, COOLING_OFF);
+		add_hint(task_details.hint_completed_text, COMPLETE);
+	}
+
+	function add_hint(text:String, state:HintState){
+		var hint = new FlxBitmapText(Fonts.normal());
+		hint.text = text;
+		hint.screenCenter();
+		hint.y -= 130;
+		hint.visible = false;
+		hint.scrollFactor.set(0,0);
+		hint_states[state] = hint;
+		hints.push(hint);
+	}
+
+	public function show_hint(state:HintState){
+		if(timer.active && state == current_state){
+			return;
+		}
+		
+		for (text in hints) {
+			text.visible = false;
+		}
+		trace(state);
+		current_state = state;
+		hint_states[state].visible = true;
+
+		timer.start(task_details.hint_duration_seconds, timer -> {
+			hint_states[state].visible = false;
+			current_state = IDLE;
 		});
 	}
+
 }

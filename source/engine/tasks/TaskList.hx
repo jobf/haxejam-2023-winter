@@ -15,7 +15,7 @@ class TaskList
 	{
 		this.tasks_to_complete = tasks_to_complete;
 		this.completed_tasks = [];
-		var task_time_allowed = 7; // different time allowance per task type
+		var task_time_allowed = 15; // different time allowance per task type
 		#if speedrun
 		task_time_allowed = 2;
 		#end
@@ -100,9 +100,10 @@ class TaskDetails
 	public var task_cooloff_seconds:Float = 999;
 	public var is_repeatable:Bool;
 	public var hint_text:String = "STAY WITH ME !";
-	public var hint_cool_off_text:String = "CANNOT USE AGAIN TOO SOON";
+	public var hint_cool_off_text:String = "";
 	public var hint_completed_text:String = "TASK COMPLETE !";
 	public var asset_path:String = "assets/images/tasks-128.png";
+	public var hint_duration_seconds:Float = 1.25;
 }
 
 class Progression

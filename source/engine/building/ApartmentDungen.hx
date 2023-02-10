@@ -297,7 +297,9 @@ class ApartmentDungen extends FlxGroup
 		tasks.add(task);
 		add(task.progress_meter);
 		task_list[placement.location] = task;
-		hint_texts.add(task.hint);
+		for (text in task.hint.hints) {
+			hint_texts.add(text);
+		}
 	}
 
 	var laundry_frames:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
