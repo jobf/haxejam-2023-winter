@@ -16,6 +16,7 @@ import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
+import flixel.util.FlxSpriteUtil;
 import flixel.util.FlxTimer;
 
 class PlayStateDungen extends FlxState
@@ -114,7 +115,8 @@ class PlayStateDungen extends FlxState
 		trace('level ends!');
 		
 		Progression.is_session_ended = true;
-		
+		FlxG.camera.follow(null);
+		FlxSpriteUtil.fadeOut(apartment.player, 0.2);
 		if(task_list.is_list_complete()){
 			Progression.completed_session_count++;
 			Progression.completed_session_time = level_timer.progress * task_list.seconds_allotted;
