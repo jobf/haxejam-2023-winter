@@ -81,7 +81,13 @@ class PlayStateDungen extends FlxState
 		apartment = new ApartmentDungen(apartment_config, width, height, grid_size, tasks_to_complete);
 		add(apartment);
 
+		@:privateAccess
+		FlxG.worldBounds.width = apartment.map_auto.width;
+		@:privateAccess
+		FlxG.worldBounds.height = apartment.map_auto.height;
+
 		FlxG.camera.follow(apartment.player);
+		FlxG.camera.setScrollBoundsRect(0, 0, FlxG.worldBounds.width, FlxG.worldBounds.height);
 		controller = new Controller(apartment.player);
 
 		apartment.player.on_start_moving = () -> player_started_moving();
