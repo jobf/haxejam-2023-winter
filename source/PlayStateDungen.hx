@@ -98,7 +98,6 @@ class PlayStateDungen extends FlxState
 
 		FlxG.cameras.add(hud_camera);
 		session_timer = new SessionTimer(task_list.seconds_allotted, ()-> end_level());
-		// session_timer.on_compla
 		// level_timer.start(task_list.seconds_allotted, timer -> end_level());
 
 		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, 
@@ -201,13 +200,30 @@ class PlayStateDungen extends FlxState
 
 		// progress task if player is at one
 		if(overlapping_task != null){
-			var task_on_complete = task_list.get_task_on_complete(overlapping_task.placement.location);
-			var on_complete = ()->{
-				task_on_complete();
-				gain_time();
+			if(overlapping_task.placement.location == BASKET){
+				
+				if(collected_items.length > 0){
+					var task_on_complete = task_list.get_task_on_complete(overlapping_task.placement.location);
+					var on_complete = ()->{
+						task_on_complete();
+						// if collected at least half of the laundry we call it complete
+						if(total_collect_items >= 4){
+							task_list.mark_task_complete(overlapping_task.placement.location);
+						}
+					}
+					overlapping_task.decrease_task_remaining(elapsed, on_complete);
+				}
+				overlapping_task.show_hint();
 			}
-			overlapping_task.decrease_task_remaining(elapsed, on_complete);
-			overlapping_task.show_hint();
+			else{
+				var task_on_complete = task_list.get_task_on_complete(overlapping_task.placement.location);
+				var on_complete = ()->{
+					task_on_complete();
+					gain_time();
+				}
+				overlapping_task.decrease_task_remaining(elapsed, on_complete);
+				overlapping_task.show_hint();
+			}
 		}
 
 		// zoom camera out while player is moving
@@ -215,6 +231,10 @@ class PlayStateDungen extends FlxState
 		{
 			FlxG.camera.zoom -= zoom_increment;
 		}
+	}
+
+	function show_time_bonus(seconds:Float){
+		// var text = 
 	}
 
 	function gain_time() {
@@ -237,7 +257,9 @@ class PlayStateDungen extends FlxState
 	{
 		overlapping_task = task;
 	}
-	
+
+
+	var total_collect_items:Int = 0;
 	function deposit_collected_items()
 	{
 		var seconds_per_item = 0.7;
@@ -247,6 +269,7 @@ class PlayStateDungen extends FlxState
 		
 		for (item in collected_items)
 		{
+			total_collect_items++;
 			// todo - animate item deposit
 			// todo - count items ? tally score ?
 			item.kill();

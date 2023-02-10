@@ -14,14 +14,16 @@ class TaskList
 	public function new(tasks_to_complete:Array<Location>)
 	{
 		this.tasks_to_complete = tasks_to_complete;
+		trace('tasks_to_complete');
+		trace(tasks_to_complete);
 		this.completed_tasks = [];
 		#if speedrun
 		task_time_allowed = 2;
 		#end
 		
-		// start with somethign to give em a change
+		// start with something to give em a change
 		seconds_allotted = 10;
-		var time_reduction = 0.1; // knock some time off to uyp the urgency
+		var time_reduction = 0.1; // knock some time off to up the urgency
 		for (location in tasks_to_complete) {
 			var task_duration = TaskData.configurations[location].task_duration_seconds;
 			var reduction = task_duration * time_reduction;
@@ -54,9 +56,9 @@ class TaskList
 			if(location == BASKET){
 				on_complete();
 			}
-			if (!completed_tasks.contains(location))
+			else if(!completed_tasks.contains(location))
 			{
-				completed_tasks.push(location);
+				mark_task_complete(location);
 				on_complete();
 			}
 		}
