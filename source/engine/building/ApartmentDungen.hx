@@ -7,9 +7,11 @@ import engine.map.BluePrint.RoomSpace;
 import engine.map.BluePrint;
 import engine.map.Canvas.AsciiCanvas;
 import engine.map.Data.FloorPlan;
+import engine.map.Data;
 import engine.tasks.Item;
 import engine.tasks.Task;
 import engine.tasks.TaskList.TaskData;
+import engine.tasks.TaskList.TaskDetails;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
@@ -58,7 +60,8 @@ class ApartmentDungen extends FlxGroup
 		var small_rooms = rooms.splice(0, 3);
 		var large_rooms = rooms.splice(rooms.length - 1, rooms.length);
 		var all_rooms = small_rooms.concat(large_rooms);
-
+		var task_zone_lookup: Map<Room, FlxSprite> = [];
+		
 		// draw walls
 		for (i => r in all_rooms)
 		{
@@ -100,35 +103,7 @@ class ApartmentDungen extends FlxGroup
 			tazk_zone_color.alpha = 40;
 			task_zone.makeGraphic(w_task_zone, h_task_zone, tazk_zone_color);
 			task_zones.add(task_zone);
-
-			var x_grid = Std.int(task_zone.x / grid_size);
-			var y_grid = Std.int(task_zone.y / grid_size);
-			var x_pixel = Std.int(task_zone.width / 2);
-			var y_pixel = Std.int(task_zone.height / 2);
-			
-			switch r.room {
-				// case EMPTY:
-				// case BATH:
-				case WASH:
-					interior_walls.set_cell(x_grid, y_grid, "B");
-					var placement:Placement = {
-						x_pixel: x_pixel,
-						y_pixel: y_pixel,
-						location: BASKET
-					}
-					task_placements[BASKET] = placement;
-				case WC:
-					interior_walls.set_cell(x_grid, y_grid, "L");
-					var placement:Placement = {
-						x_pixel: x_pixel,
-						y_pixel: y_pixel,
-						location: LAVATORY
-					}
-					task_placements[LAVATORY] = placement;
-				// case BED:
-				// case KITCHEN:
-				case _:
-			}
+			task_zone_lookup[r.room] = task_zone;
 
 			for (w in r.all_walls)
 			{
@@ -140,8 +115,6 @@ class ApartmentDungen extends FlxGroup
 					x: x_center,
 					y: y_center
 				}
-
-				// trace('room $i door center ${center.x} ${center.y}');
 
 				var door_center = Std.int(door_width / 2);
 				var door_symbol = "+";
@@ -209,14 +182,17 @@ class ApartmentDungen extends FlxGroup
 		// instead of setting here
 		interior_walls.set_cell(x_grid_player, y_grid_player, "@");
 
-		
-
 		for (location in tasks_to_complete)
 		{
-			if (task_placements.exists(location))
-			{
-				
-				place_task(task_placements[location]);
+			var task_details = TaskData.configurations[location];
+			if(task_zone_lookup.exists(task_details.room)){
+				var zone = task_zone_lookup[task_details.room];
+				var placement:Placement = {
+								x_pixel: Std.int(zone.width / 2 + zone.x),
+								y_pixel: Std.int(zone.height / 2 + zone.y),
+								location: location
+							}
+				place_task(placement, task_details);
 			}
 			else
 			{
@@ -258,17 +234,17 @@ class ApartmentDungen extends FlxGroup
 
 	public var task_list(default, null):Map<Location, Task> = [];
 
-	function place_task(placement:Placement)
+	function place_task(placement:Placement, details:TaskDetails)
 	{
 		trace('set up task ' + placement.location + ' ${placement.x_pixel} , ${placement.y_pixel} ');
-		var task_size = 48;
-		var task_center = task_size / 2;
+		// var task_size = 48;
+		// var task_center = task_size / 2;
 		var task = new Task({
-			x: Std.int(placement.x_pixel - task_center),
-			y: Std.int(placement.y_pixel - task_center),
-			size: task_size,
+			x: placement.x_pixel,//Std.int(placement.x_pixel - task_center),
+			y: placement.y_pixel,//Std.int(placement.y_pixel - task_center),
+			size: 32, // shrug idk
 			color: get_color(placement.location),
-			details: TaskData.configurations[placement.location]
+			details: details
 		}, placement);
 
 		tasks.add(task);

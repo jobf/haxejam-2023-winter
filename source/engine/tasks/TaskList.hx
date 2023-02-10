@@ -1,6 +1,7 @@
 package engine.tasks;
 
 import engine.building.Layout.Location;
+import engine.map.Data.Room;
 
 class TaskList
 {
@@ -56,12 +57,14 @@ class TaskData
 {
 	public static var configurations:Map<Location, TaskDetails> = [
 		BASKET => {
+			room: WASH,
 			task_duration_seconds: 0.5,
 			task_cooloff_seconds: 0.5,
 			hint_text: "BRING ME CLOTHES !",
 			is_repeatable: true
 		},
 		LAVATORY => {
+			room: WC,
 			task_duration_seconds: 5.0,
 			is_repeatable: false,
 			hint_text: "STAY WITH ME !",
@@ -72,6 +75,7 @@ class TaskData
 @:structInit
 class TaskDetails
 {
+	public var room:Room;
 	public var task_duration_seconds:Float;
 	public var task_cooloff_seconds:Float = 999;
 	public var is_repeatable:Bool;
