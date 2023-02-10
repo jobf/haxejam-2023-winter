@@ -29,7 +29,6 @@ class PlayStateDungen extends FlxState
 	var collected_laundry:FlxTypedGroup<Item>;
 	var hud_camera:FlxCamera;
 	var hud:Hud;
-	var level_timer:FlxTimer;
 	var level_progress_bar:CallbackFlxBar;
 	var is_player_moving:Bool = false;
 	var camera_zoom_tween:FlxTween;
@@ -44,6 +43,8 @@ class PlayStateDungen extends FlxState
 	var overlapping_task:Task;
 
 	var task_list:TaskList;
+	var session_timer:SessionTimer;
+
 
 
 	override public function create()
@@ -96,11 +97,12 @@ class PlayStateDungen extends FlxState
 		hud_camera.follow(hud.background, FlxCameraFollowStyle.NO_DEAD_ZONE);
 
 		FlxG.cameras.add(hud_camera);
-		level_timer = new FlxTimer();
-		level_timer.start(task_list.seconds_allotted, timer -> end_level());
+		session_timer = new SessionTimer(task_list.seconds_allotted, ()-> end_level());
+		// session_timer.on_compla
+		// level_timer.start(task_list.seconds_allotted, timer -> end_level());
 
 		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, 
-			() -> return level_timer.progress * task_list.seconds_allotted,0, 30);
+			() -> session_timer.get_time_remaining(),0, task_list.seconds_allotted);
 		level_progress_bar.scrollFactor.set(0, 0);
 		level_progress_bar.cameras = [hud_camera];
 		for (hint_text in apartment.hint_texts.members) {
@@ -119,7 +121,7 @@ class PlayStateDungen extends FlxState
 		FlxSpriteUtil.fadeOut(apartment.player, 0.2);
 		if(task_list.is_list_complete()){
 			Progression.completed_session_count++;
-			Progression.completed_session_time = level_timer.progress * task_list.seconds_allotted;
+			Progression.completed_session_time = session_timer.get_time_remaining();
 			FlxG.camera.fade(FlxColor.WHITE, 1, false, start_next_level);
 		}
 		else{
@@ -133,7 +135,7 @@ class PlayStateDungen extends FlxState
 	function start_next_level():Void
 	{
 		var pause_for_thought = new FlxTimer();
-		pause_for_thought.start(0.5, timer -> FlxG.switchState(new PlayStateDungen()));
+		pause_for_thought.start(0.75, timer -> FlxG.switchState(new PlayStateDungen()));
 	}
 
 	function player_stopped_moving()
@@ -165,13 +167,14 @@ class PlayStateDungen extends FlxState
 		if(Progression.is_session_ended){
 			return;
 		}
-		
+		session_timer.update(elapsed);
 		if(task_list.is_list_complete())
 		{
 			end_level();
 		}
 
 		controller.update(FlxG.keys);
+		#if debug
 		if (FlxG.keys.justPressed.I)
 		{
 			zoom(-1);
@@ -184,6 +187,7 @@ class PlayStateDungen extends FlxState
 		{
 			FlxG.resetState();
 		}
+		#end
 
 		@:privateAccess
 		FlxG.collide(apartment.map_auto, apartment.player);
@@ -197,7 +201,11 @@ class PlayStateDungen extends FlxState
 
 		// progress task if player is at one
 		if(overlapping_task != null){
-			var on_complete = task_list.get_task_on_complete(overlapping_task.placement.location);
+			var task_on_complete = task_list.get_task_on_complete(overlapping_task.placement.location);
+			var on_complete = ()->{
+				task_on_complete();
+				gain_time();
+			}
 			overlapping_task.decrease_task_remaining(elapsed, on_complete);
 			overlapping_task.show_hint();
 		}
@@ -209,6 +217,15 @@ class PlayStateDungen extends FlxState
 		}
 	}
 
+	function gain_time() {
+		if(overlapping_task.placement.location == BASKET){
+			// time bonus for laundry handled in deposit_collected_items
+			return;
+		}
+		
+		var time_bonus = overlapping_task.config.details.time_bonus;
+		session_timer.gain_time(time_bonus);
+	}
 	
 
 	function overlap_laundry_with_player(laundry:Item, player:Actor)
@@ -223,7 +240,11 @@ class PlayStateDungen extends FlxState
 	
 	function deposit_collected_items()
 	{
-		trace('deposit_collected_items');
+		var seconds_per_item = 0.7;
+		var time_bonus_total  = collected_items.length * seconds_per_item;
+		trace('deposit_collected_items $seconds_per_item * ${collected_items.length} = $time_bonus_total');
+		session_timer.gain_time(time_bonus_total);
+		
 		for (item in collected_items)
 		{
 			// todo - animate item deposit
@@ -286,5 +307,47 @@ class Hud extends FlxGroup
 		background = new FlxSprite(x, 0);
 		background.makeGraphic(1, 1, FlxColor.TRANSPARENT);
 		add(background);
+	}
+}
+
+class SessionTimer{
+	var initial_duration_seconds:Float;
+	var remaining_seconds:Float;
+	var is_complete:Bool;
+	var on_complete:Void->Void;
+
+	public function new(initial_duration_seconds:Float, on_complete:Void->Void){
+		this.initial_duration_seconds = initial_duration_seconds;
+		remaining_seconds = initial_duration_seconds;
+		is_complete = false;
+		this.on_complete = on_complete;
+	}
+
+	public function update(elapsed_seconds:Float){
+		if(is_complete){
+			return;
+		}
+		
+		remaining_seconds -= elapsed_seconds;
+		
+		if(remaining_seconds <= 0){
+			is_complete = true;
+			on_complete();
+		}
+	}
+
+	public function get_progress_percentage():Float{
+		return remaining_seconds / initial_duration_seconds;
+	}
+
+	public function gain_time(seconds:Float){
+		remaining_seconds += seconds;
+		if(remaining_seconds > initial_duration_seconds){
+			remaining_seconds = initial_duration_seconds;
+		}
+	}
+
+	public function get_time_remaining():Float {
+		return remaining_seconds;
 	}
 }

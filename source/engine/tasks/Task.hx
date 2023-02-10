@@ -83,13 +83,11 @@ class Task extends FlxSprite
 	public function decrease_task_remaining(seconds:Float, on_task_complete:() -> Void)
 	{
 		if(is_cooling_off){
-			// hint.visible = false;
 			return;
 		}
 		
 		if (task_remaining_seconds > 0)
 		{
-			// hint.visible = true;
 			task_remaining_seconds -= seconds;
 			if (task_remaining_seconds <= 0)
 			{
@@ -101,12 +99,21 @@ class Task extends FlxSprite
 				if(config.details.is_repeatable){
 					// trace('starting cool off timer');
 					// cool off before resetting to allow repeat
-					timer.start(config.details.task_cooloff_seconds, timer -> {
-						task_remaining_seconds = config.details.task_duration_seconds;
+
+					if(config.details.task_cooloff_seconds > 0){
+						timer.start(config.details.task_cooloff_seconds, timer -> {
+							task_remaining_seconds = config.details.task_duration_seconds;
+							is_cooling_off = false;
+							hint_state = READY;
+							// trace('cool off complete');
+						});
+					}
+					else{
+						// special case for laundry
 						is_cooling_off = false;
 						hint_state = READY;
-						// trace('cool off complete');
-					});
+						task_remaining_seconds = config.details.task_duration_seconds;
+					}
 				}
 				else{
 					hint_state = COMPLETE;
@@ -182,7 +189,7 @@ class Hint{
 		for (text in hints) {
 			text.visible = false;
 		}
-		trace(state);
+		// trace(state);
 		current_state = state;
 		hint_states[state].visible = true;
 
