@@ -26,5 +26,6 @@ enum Room
 	BATH;
 	WASH;
 	WC;
+	BED;
 	KITCHEN;
 }

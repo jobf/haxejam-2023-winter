@@ -8,6 +8,8 @@ import dropecho.dungen.generators.RoomGenerator;
 import dropecho.interop.Extender;
 import engine.map.BluePrint;
 import engine.map.Canvas;
+import engine.map.Data.Room;
+import engine.map.Data.RoomShape;
 
 using dropecho.dungen.Map2d;
 
@@ -15,6 +17,15 @@ class ApartmentGenerator
 {
 	public static function buildRooms(tree:BSPTree<BSPData>, rooms:Array<RoomSpace>, edges:Perimeter, ?opts:Dynamic = null):Map2d
 	{
+		var room_order:Array<Room> = [
+			WC,
+			BATH,
+			WASH,
+			BED
+		];
+		
+		var found_rooms:Array<Room> = [];
+		
 		var params = Extender.defaults(new RoomParams(), opts);
 
 		var rootvalue = tree.getRoot().value;
@@ -62,16 +73,19 @@ class ApartmentGenerator
 				edge: TOP,
 			};
 
-			var task_rect:Rectangle = {
-				w: 0,
-				h: 0
-			}
-
+			
 			walls_rect.x = roomStartX - 1;
 			walls_rect.y = roomStartY - 1;
-
+			
 			walls_rect.w = roomEndX - (roomStartX - 1);
 			walls_rect.h = roomEndY - (roomStartY - 1);
+			
+			var task_rect:Rectangle = {
+				x: walls_rect.x,
+				y: walls_rect.y,
+				w: walls_rect.w,
+				h: Std.int(walls_rect.h / 2)
+			}
 
 			var walls:Array<Wall> = [
 				{
@@ -155,6 +169,10 @@ class ApartmentGenerator
 				aligns_with_other_wall;
 			});
 
+			var is_all_rooms_found = found_rooms.length == room_order.length;
+			var room_found = is_all_rooms_found ? EMPTY : room_order[found_rooms.length];
+			found_rooms.push(room_found);
+			
 			rooms.push({
 				index: rooms.length,
 				walls: walls_rect,
@@ -163,11 +181,14 @@ class ApartmentGenerator
 				cells: new AsciiCanvas(walls_rect.w, walls_rect.h),
 				interior_walls: interior_walls,
 				aligned_walls: aligned_walls,
-				all_walls: walls
+				all_walls: walls,
+				room: room_found == null ? EMPTY : room_found
 			});
 
 			return true;
 		}
+
+		
 
 		var visitor = new PostOrderTraversal();
 
@@ -175,5 +196,18 @@ class ApartmentGenerator
 		visitor.visited.resize(0);
 
 		return map;
+	}
+}
+
+
+
+
+/**
+	Definitions of furniture sizes at grid level
+**/
+class Furniture{
+	public static var bath:RoomShape  = {
+		long_edge: 6,
+		short_edge: 4
 	}
 }

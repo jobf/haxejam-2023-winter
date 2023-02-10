@@ -80,7 +80,6 @@ class PlayStateDungen extends FlxState
 		apartment = new ApartmentDungen(rooms, width, height, grid_size, tasks_to_complete);
 		add(apartment);
 
-
 		FlxG.camera.follow(apartment.player);
 		controller = new Controller(apartment.player);
 

@@ -196,6 +196,7 @@ class RoomSpace
 	public var interior_walls:Array<Wall> = [];
 	public var aligned_walls:Array<Wall> = [];
 	public var all_walls:Array<Wall> = [];
+	public var room:Room;
 }
 
 enum Edge

@@ -120,6 +120,11 @@ class AsciiCanvas extends GridLogic
 			var end = start + numColumns;
 			var line = cells.slice(start, end).join(",");
 			var cleaned = StringTools.replace(line, ".", "0");
+
+			// todo - this is dirty, clean it up
+			cleaned = StringTools.replace(cleaned, "B", "0");
+			cleaned = StringTools.replace(cleaned, "L", "0");
+
 			cleaned = StringTools.replace(cleaned, "##", "#");
 			cleaned = StringTools.replace(cleaned, "#", "1");
 			cleaned = StringTools.replace(cleaned, "+", "0");
