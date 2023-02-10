@@ -17,7 +17,6 @@ class TaskConfig
 	public var x:Int;
 	public var y:Int;
 	public var color:FlxColor;
-	public var size:Int = 48;
 	public var details:Null<TaskDetails> = null;
 }
 
@@ -64,13 +63,14 @@ class Task extends FlxSprite
 		super(config.x, config.y);
 		this.config = config;
 		this.placement = placement;
-		makeGraphic(config.size, config.size, config.color);
+		loadGraphic(config.details.asset_path, true, config.details.frame_size, config.details.frame_size);
+		animation.frameIndex = config.details.frame_index;
 		immovable = true;
 		task_remaining_seconds = config.details.task_duration_seconds;
 		is_cooling_off = false;
 		timer = new FlxTimer();
 		timer_hint = new FlxTimer();
-		progress_meter = new CallbackFlxBar(x + config.size + 4, y, BOTTOM_TO_TOP, 20, 30, () -> get_progress(), 0, get_duration());
+		progress_meter = new CallbackFlxBar(x + config.details.frame_size + 4, y, BOTTOM_TO_TOP, 20, 30, () -> get_progress(), 0, get_duration());
 		hint = new FlxBitmapText(Fonts.normal());
 		hint.text = config.details.hint_text;
 		hint.screenCenter();
@@ -94,6 +94,7 @@ class Task extends FlxSprite
 			if (task_remaining_seconds <= 0)
 			{
 				on_task_complete();
+				animation.frameIndex = config.details.frame_index_complete;
 				// trace('is cooling off');
 				is_cooling_off = true;
 				if(config.details.is_repeatable){

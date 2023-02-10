@@ -57,4 +57,6 @@ enum Location{
 	WALL;
 	BASKET;
 	LAVATORY;
+	RUG;
+	BED;
 }

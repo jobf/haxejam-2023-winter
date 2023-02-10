@@ -244,7 +244,6 @@ class ApartmentDungen extends FlxGroup
 		var task = new Task({
 			x: placement.x_pixel,//Std.int(placement.x_pixel - task_center),
 			y: placement.y_pixel,//Std.int(placement.y_pixel - task_center),
-			size: 32, // shrug idk
 			color: get_color(placement.location),
 			details: details
 		}, placement);
@@ -280,6 +279,7 @@ class ApartmentDungen extends FlxGroup
 			case WALL: 0x6a5f49ff;
 			case BASKET: 0xffffffff;
 			case LAVATORY: 0xff876b61;
+			case _: 0x33acbef6;
 		}
 	}
 }

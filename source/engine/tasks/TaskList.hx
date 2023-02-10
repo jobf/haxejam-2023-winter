@@ -57,6 +57,8 @@ class TaskData
 {
 	public static var configurations:Map<Location, TaskDetails> = [
 		BASKET => {
+			frame_index: 32,
+			frame_index_complete: 40,
 			room: WASH,
 			task_duration_seconds: 0.5,
 			task_cooloff_seconds: 0.5,
@@ -64,10 +66,25 @@ class TaskData
 			is_repeatable: true
 		},
 		LAVATORY => {
+			frame_index: 48,
+			frame_index_complete: 56,
 			room: WC,
 			task_duration_seconds: 5.0,
 			is_repeatable: false,
-			hint_text: "STAY WITH ME !",
+		},
+		RUG => {
+			frame_index: 16,
+			frame_index_complete: 24,
+			room:EMPTY,
+			task_duration_seconds: 2.0,
+			is_repeatable: false,
+		},
+		BED => {
+			frame_index: 0,
+			frame_index_complete: 8,
+			room:BED,
+			task_duration_seconds: 3.0,
+			is_repeatable: false,
 		}
 	];
 }
@@ -76,12 +93,16 @@ class TaskData
 class TaskDetails
 {
 	public var room:Room;
+	public var frame_index:Int;
+	public var frame_index_complete:Int;
+	public var frame_size:Int = 128;
 	public var task_duration_seconds:Float;
 	public var task_cooloff_seconds:Float = 999;
 	public var is_repeatable:Bool;
-	public var hint_text:String;
+	public var hint_text:String = "STAY WITH ME !";
 	public var hint_cool_off_text:String = "CANNOT USE AGAIN TOO SOON";
 	public var hint_completed_text:String = "TASK COMPLETE !";
+	public var asset_path:String = "assets/images/tasks-128.png";
 }
 
 class Progression
