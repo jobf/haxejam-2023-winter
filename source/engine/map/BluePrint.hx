@@ -63,7 +63,7 @@ class BluePrint
 		var bsp = new Generator({
 			width: width,
 			height: height,
-			minWidth: 7,
+			minWidth: 9,
 			minHeight: 9,
 			depth: 4,
 			ratio: .909,

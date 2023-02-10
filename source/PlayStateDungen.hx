@@ -234,13 +234,16 @@ class PlayStateDungen extends FlxState
 
 	function collect(laundry:Item)
 	{
+		var collection_size = 32;
 		laundry.kill();
 		var collected = new Item({
 			y: collection_y,
 			x: collection_x + ((collection_size + collection_size_gap) * collected_items.length),
 			size: collection_size,
-			color: laundry.config.color
+			color: laundry.config.color,
+			asset_path: "assets/images/items-32.png"
 		});
+		collected.animation.frameIndex = laundry.animation.frameIndex;
 		collected.cameras = [hud_camera];
 		collected_items.push(collected);
 		collected_laundry.add(collected);

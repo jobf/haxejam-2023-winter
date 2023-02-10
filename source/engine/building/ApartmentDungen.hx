@@ -70,7 +70,7 @@ class ApartmentDungen extends FlxGroup
 			var wall_symbol = i + '';
 			// var wall_symbol = ",";
 			var wall_symbol = "#";
-			for (w in r.apartment_canvas)
+			for (w in r.interior_walls)
 			{
 				apartment_canvas.draw_line(w.x_start, w.y_start, w.x_end, w.y_end, wall_symbol);
 			}
@@ -255,14 +255,20 @@ class ApartmentDungen extends FlxGroup
 		hint_texts.add(task.hint);
 	}
 
+	var laundry_frames:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 	function place_dirty_laundry(spot:Placement)
 	{
-		laundry.add(new Item({
+		var item = new Item({
 			x: spot.x_pixel,
 			y: spot.y_pixel,
 			size: grid_size,
-			color: 0xFFf3edc6
-		}));
+			color: 0xFFf3edc6,
+			asset_path: "assets/images/items-32.png"
+		});
+		
+		var random_laundry_item_index:Int  = FlxG.random.int(0, laundry_frames.length - 1);
+		item.animation.frameIndex = laundry_frames[random_laundry_item_index];
+		laundry.add(item);
 	}
 
 	function get_color(location:Location):FlxColor

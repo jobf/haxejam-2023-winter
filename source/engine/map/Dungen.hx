@@ -6,7 +6,6 @@ import dropecho.ds.algos.PostOrderTraversal;
 import dropecho.dungen.bsp.BSPData;
 import dropecho.dungen.generators.RoomGenerator;
 import dropecho.interop.Extender;
-import engine.building.Layout;
 import engine.map.BluePrint;
 import engine.map.Canvas;
 import engine.map.Data;
@@ -87,7 +86,7 @@ class ApartmentGenerator
 				x: walls_rect.x,
 				y: walls_rect.y,
 				w: walls_rect.w,
-				h: Std.int(walls_rect.h / 2)
+				h: walls_rect.h,//Std.int(walls_rect.h / 2)
 			}
 
 			var walls:Array<Wall> = [
