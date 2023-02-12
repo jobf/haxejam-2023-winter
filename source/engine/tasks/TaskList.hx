@@ -94,7 +94,7 @@ class TaskData
 			room: EMPTY,
 			task_duration_seconds: 1.5,
 			is_repeatable: false,
-			variations_count: 5
+			variations_count: 4
 		},
 		BED => {
 			frame_index: 0,
@@ -102,7 +102,7 @@ class TaskData
 			room: BEDROOM,
 			task_duration_seconds: 2.0,
 			is_repeatable: false,
-			variations_count: 5
+			variations_count: 4
 		},
 		DRAWERS => {
 			frame_index: 33,
