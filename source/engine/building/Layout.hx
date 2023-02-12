@@ -59,4 +59,8 @@ enum Location{
 	LAVATORY;
 	RUG;
 	BED;
+	DRAWERS;
+	DISHES;
+	BATH;
+	SHOWER;
 }

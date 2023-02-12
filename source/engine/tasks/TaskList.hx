@@ -97,7 +97,36 @@ class TaskData
 			room:BEDROOM,
 			task_duration_seconds: 2.0,
 			is_repeatable: false,
-		}
+		},
+		DRAWERS => {
+			frame_index: 33,
+			frame_index_complete: 41,
+			room:BEDROOM,
+			task_duration_seconds: 2.0,
+			is_repeatable: false,
+		},
+		DISHES => {
+			frame_index: 34,
+			frame_index_complete: 42,
+			room:KITCHEN,
+			task_duration_seconds: 2.0,
+			is_repeatable: false,
+		},
+		BATH => {
+			frame_index: 35,
+			frame_index_complete: 43,
+			room:BATH,
+			task_duration_seconds: 2.0,
+			is_repeatable: false,
+		},
+		SHOWER => {
+			frame_index:36,
+			frame_index_complete: 44,
+			room:WASH,
+			task_duration_seconds: 2.0,
+			is_repeatable: false,
+		},
+
 	];
 }
 
@@ -119,6 +148,7 @@ class TaskDetails
 	public var hint_completed_text:String = "TASK COMPLETE !";
 	public var asset_path:String = "assets/images/tasks-128.png";
 	public var hint_duration_seconds:Float = 1.25;
+	public var variations_count:Int = 0;
 
 	function get_time_bonus():Float {
 		return completed_time_bonus_percentage * task_duration_seconds;
@@ -154,13 +184,30 @@ class Progression
 			tasks.push(LAVATORY);
 		}
 
-		if(completed_session_count > 3){
+		if(completed_session_count > 2){
 			tasks.push(BED);
 		}
 
-		if(completed_session_count >= 5){
+		if(completed_session_count >= 3){
 			tasks.push(RUG);
 		}
+
+		if(completed_session_count >= 4){
+			tasks.push(BATH);
+		}
+		
+		if(completed_session_count >= 5){
+			tasks.push(DISHES);
+		}
+
+		if(completed_session_count >= 6){
+			tasks.push(DRAWERS);
+		}
+
+		if(completed_session_count >= 7){
+			tasks.push(SHOWER);
+		}
+
 
 		return tasks;
 	}
