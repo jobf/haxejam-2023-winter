@@ -84,13 +84,14 @@ class ApartmentDungen extends FlxGroup
 		// set up rest of room
 		for (i => r in all_rooms)
 		{
+			
 			var x_task_zone = Std.int(r.task_zone.x * grid_size);
 			var y_task_zone = Std.int(r.task_zone.y * grid_size);
 			var w_task_zone = Std.int(r.task_zone.w * grid_size);
 			var h_task_zone = Std.int(r.task_zone.h * grid_size);
-
+			
 			trace('make zone hotspot room ${r.room} $x_task_zone , $y_task_zone  $w_task_zone x $h_task_zone');
-
+			
 			var tazk_zone_color = switch r.room
 			{
 				// case EMPTY:
@@ -110,12 +111,32 @@ class ApartmentDungen extends FlxGroup
 				h_pixel: h_task_zone,
 				room: r.room,
 				rect: r.task_zone,
-				color: tazk_zone_color
+				color: tazk_zone_color,
+				spaces: [
+					{
+						task: EMPTY,
+						shape: {
+							x: x_task_zone,
+							y: y_task_zone,
+							w: 128,
+							h: 128
+						},
+					},
+					{
+						task: EMPTY,
+						shape: {
+							x: x_task_zone + 128,
+							y: y_task_zone + 128,
+							w: 128,
+							h: 128
+						},
+					}
+				]
 			}
 			var task_zone = new TaskZone(zone_config);
 			task_zones.add(task_zone);
 			task_zone_lookup[r.room] = task_zone;
-
+			
 			for (w in r.all_walls)
 			{
 				var width = w.x_start + w.x_end;
@@ -239,12 +260,21 @@ class ApartmentDungen extends FlxGroup
 				}
 
 				var zone = task_zone_lookup[task_details.room];
-				var placement:Placement = {
-					x_pixel: Std.int(zone.width / 2 + zone.x),
-					y_pixel: Std.int(zone.height / 2 + zone.y),
-					location: location
+				var task_is_placed = false;
+				for (space in zone.config.spaces) {
+					if(task_is_placed || space.is_occupied){
+						continue;
+					}
+					var placement:Placement = {
+						x_pixel: Std.int(space.shape.w / 2 + space.shape.x),
+						y_pixel: Std.int(space.shape.h / 2 + space.shape.y),
+						location: location
+					}
+					space.task = location;
+					space.is_occupied = true;
+					place_task(placement, task_details);
+					task_is_placed = true;
 				}
-				place_task(placement, task_details);
 			}
 		}
 

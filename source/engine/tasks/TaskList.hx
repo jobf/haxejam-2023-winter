@@ -20,11 +20,12 @@ class TaskList
 		#if speedrun
 		task_time_allowed = 2;
 		#end
-		
+
 		// start with something to give em a change
 		seconds_allotted = 10;
 		var time_reduction = 0.1; // knock some time off to up the urgency
-		for (location in tasks_to_complete) {
+		for (location in tasks_to_complete)
+		{
 			var task_duration = TaskData.configurations[location].task_duration_seconds;
 			var reduction = task_duration * time_reduction;
 			seconds_allotted += (task_duration - reduction);
@@ -53,10 +54,11 @@ class TaskList
 		return () ->
 		{
 			// special case for laundry
-			if(location == BASKET){
+			if (location == BASKET)
+			{
 				on_complete();
 			}
-			else if(!completed_tasks.contains(location))
+			else if (!completed_tasks.contains(location))
 			{
 				mark_task_complete(location);
 				on_complete();
@@ -87,46 +89,45 @@ class TaskData
 		RUG => {
 			frame_index: 16,
 			frame_index_complete: 24,
-			room:EMPTY,
+			room: EMPTY,
 			task_duration_seconds: 1.5,
 			is_repeatable: false,
 		},
 		BED => {
 			frame_index: 0,
 			frame_index_complete: 8,
-			room:BEDROOM,
+			room: BEDROOM,
 			task_duration_seconds: 2.0,
 			is_repeatable: false,
 		},
 		DRAWERS => {
 			frame_index: 33,
 			frame_index_complete: 41,
-			room:BEDROOM,
-			task_duration_seconds: 2.0,
-			is_repeatable: false,
-		},
-		DISHES => {
-			frame_index: 34,
-			frame_index_complete: 42,
-			room:KITCHEN,
+			room: BEDROOM,
 			task_duration_seconds: 2.0,
 			is_repeatable: false,
 		},
 		BATH => {
 			frame_index: 35,
 			frame_index_complete: 43,
-			room:BATH,
+			room: BATH,
+			task_duration_seconds: 2.0,
+			is_repeatable: false,
+		},
+		DISHES => {
+			frame_index: 34,
+			frame_index_complete: 42,
+			room: KITCHEN,
 			task_duration_seconds: 2.0,
 			is_repeatable: false,
 		},
 		SHOWER => {
-			frame_index:36,
+			frame_index: 36,
 			frame_index_complete: 44,
-			room:WASH,
+			room: BATH,
 			task_duration_seconds: 2.0,
 			is_repeatable: false,
 		},
-
 	];
 }
 
@@ -150,7 +151,8 @@ class TaskDetails
 	public var hint_duration_seconds:Float = 1.25;
 	public var variations_count:Int = 0;
 
-	function get_time_bonus():Float {
+	function get_time_bonus():Float
+	{
 		return completed_time_bonus_percentage * task_duration_seconds;
 	}
 }
@@ -174,40 +176,46 @@ class Progression
 
 	public static function get_tasks():Array<Location>
 	{
-		var tasks =  [BASKET];
+		var tasks = [BASKET];
 
 		#if alltasks
 		completed_session_count = 999;
 		#end
 
-		if(completed_session_count > 1){
+		if (completed_session_count > 1)
+		{
 			tasks.push(LAVATORY);
 		}
 
-		if(completed_session_count > 2){
+		if (completed_session_count > 2)
+		{
 			tasks.push(BED);
 		}
 
-		if(completed_session_count >= 3){
+		if (completed_session_count >= 3)
+		{
 			tasks.push(RUG);
 		}
 
-		if(completed_session_count >= 4){
+		if (completed_session_count >= 4)
+		{
 			tasks.push(BATH);
 		}
-		
-		if(completed_session_count >= 5){
+
+		if (completed_session_count >= 5)
+		{
 			tasks.push(DISHES);
 		}
 
-		if(completed_session_count >= 6){
+		if (completed_session_count >= 6)
+		{
 			tasks.push(DRAWERS);
 		}
 
-		if(completed_session_count >= 7){
+		if (completed_session_count >= 7)
+		{
 			tasks.push(SHOWER);
 		}
-
 
 		return tasks;
 	}

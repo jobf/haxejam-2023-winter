@@ -3,6 +3,7 @@ package engine.tasks;
 import engine.building.Layout;
 import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint.Rectangle;
+import engine.map.BluePrint;
 import engine.map.Data;
 import engine.tasks.TaskList.TaskDetails;
 import engine.ui.Fonts;
@@ -37,6 +38,7 @@ class TaskZoneConfig{
 	public var rect:Rectangle;
 	public var room:Room;
 	public var color:FlxColor;
+	public var spaces:Array<TaskSpace>;
 }
 
 class TaskZone extends  FlxSprite{

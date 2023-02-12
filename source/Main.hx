@@ -15,12 +15,9 @@ class Main extends Sprite
 		var draw_rate = 60;
 		var skip_splash = true;
 		var start_full_screen = false;
-		#if original
-		addChild(new FlxGame(0, 0, PlayState, zoom, update_rate, draw_rate, skip_splash, start_full_screen));
-		#else
-		//addChild(new FlxGame(0, 0, PlayStateDungen, zoom, update_rate, draw_rate, skip_splash, start_full_screen));
-		addChild(new FlxGame(0,0,MainMenu,update_rate,draw_rate,skip_splash,start_full_screen));
-		#end
+
+		addChild(new FlxGame(0, 0, PlayStateDungen, zoom, update_rate, draw_rate, skip_splash, start_full_screen));
+		// addChild(new FlxGame(0,0,MainMenu,update_rate,draw_rate,skip_splash,start_full_screen));
 
 
 		FlxG.mouse.useSystemCursor = true;

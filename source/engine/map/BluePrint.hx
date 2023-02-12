@@ -197,6 +197,13 @@ class DoorSpace
 }
 
 @:structInit
+class TaskSpace{
+	public var shape:Rectangle;
+	public var task:Location;
+	public var is_occupied:Bool = false;
+}
+
+@:structInit
 class RoomSpace
 {
 	public var index:Int = 0;
