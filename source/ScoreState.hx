@@ -7,6 +7,7 @@ import flixel.FlxState;
 import flixel.text.FlxBitmapText;
 import flixel.util.FlxSpriteUtil;
 import flixel.util.FlxStringUtil;
+import flixel.util.FlxTimer;
 
 class ScoreState extends FlxState{
 	var score_amount:FlxBitmapText;
@@ -46,8 +47,8 @@ class ScoreState extends FlxState{
 		instructions.screenCenter();
 		instructions.y += 150;
 
-
-		FlxSpriteUtil.flicker(score_message, 100, 0.25, true, true);
+		var timer = new FlxTimer();
+		timer.start(1.5, timer -> FlxSpriteUtil.flicker(instructions, 100, 0.25, true, true));
 	}
 
 	override function update(elapsed:Float) {

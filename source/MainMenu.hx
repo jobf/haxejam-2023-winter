@@ -9,6 +9,8 @@ import flixel.FlxState;
 import flixel.text.FlxBitmapText;
 import flixel.text.FlxText.FlxTextAlign;
 import flixel.util.FlxColor;
+import flixel.util.FlxSpriteUtil;
+import flixel.util.FlxTimer;
 
 class MainMenu extends FlxState
 {
@@ -30,6 +32,9 @@ class MainMenu extends FlxState
 		instructions.y = FlxG.height - instructions.height - 64;
 		add(instructions);
 		Music.play_menu_music();
+
+		var timer = new FlxTimer();
+		timer.start(1.5, timer -> FlxSpriteUtil.flicker(instructions, 100, 0.25, true, true));
 	}
 
 	override function update(elapsed:Float) {

@@ -23,7 +23,7 @@ class ActorConfig
 	var is_animated:Bool = false;
 	var animation_frame_rate: Int = 12;
 	var animation_frame_size: Int = 64;
-	var animation_frame_index_idle: Int = 4;
+	public var animation_frame_index_idle: Int = 0;
 }
 
 @:allow(engine.actor.Controller)
@@ -97,9 +97,12 @@ class Actor extends FlxSprite
 		on_start_moving();
 	}
 
-	public function stop(notify_stopped:Bool)
+	public function stop(notify_stopped:Bool, is_hard_stop:Bool = false)
 	{
 		acceleration.set(0, 0);
+		if(is_hard_stop){
+			velocity.set(0, 0);
+		}
 		if(notify_stopped){
 			on_stop_moving();
 		}

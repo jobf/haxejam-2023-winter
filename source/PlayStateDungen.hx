@@ -133,25 +133,34 @@ class PlayStateDungen extends FlxState
 		
 		Progression.is_session_ended = true;
 		FlxG.camera.follow(null);
-		FlxSpriteUtil.fadeOut(apartment.player, 0.2);
-		if(task_list.is_list_complete()){
+		apartment.player.animation.play("S");
+		apartment.player.animation.stop();
+		apartment.player.animation.frameIndex = apartment.player.config.animation_frame_index_idle;
+		apartment.player.stop(false, true);
+		if(task_list.is_list_complete())
+		{
 			Progression.completed_session_count++;
 			Progression.completed_session_time = session_timer.get_time_remaining();
-			FlxG.camera.fade(FlxColor.WHITE, 1, false, start_next_level);
+			start_next_level();
 		}
-		else{
-			Music.stop();
-			var scoreBg = 0xfffec7fb;
-			var go_to_score_state = ()-> FlxG.switchState(new ScoreState());
-			FlxG.camera.fade(scoreBg, 1, false, go_to_score_state);
+		else
+		{
+			start_score_state();
 		}
+	}
 
+	function start_score_state(){
+		Music.stop();
+		var scoreBg = 0xfffec7fb;
+		FlxSpriteUtil.fadeOut(apartment.player, 1.25, tween -> FlxG.camera.fade(scoreBg, 2, false, ()-> FlxG.switchState(new ScoreState())));
 	}
 
 	function start_next_level():Void
 	{
 		var pause_for_thought = new FlxTimer();
-		pause_for_thought.start(0.75, timer -> FlxG.switchState(new PlayStateDungen()));
+		pause_for_thought.start(2.0, timer -> {
+			FlxG.camera.fade(FlxColor.WHITE, 2, false, () -> FlxG.switchState(new PlayStateDungen()));
+		});
 	}
 
 	function player_stopped_moving()
@@ -183,7 +192,9 @@ class PlayStateDungen extends FlxState
 		if(Progression.is_session_ended){
 			return;
 		}
+
 		session_timer.update(elapsed);
+		
 		if(task_list.is_list_complete())
 		{
 			end_level();
@@ -224,9 +235,8 @@ class PlayStateDungen extends FlxState
 					var on_complete = ()->{
 						task_on_complete();
 						// if collected at least half of the laundry we call it complete
-						if(total_collect_items >= 4){
+						if(task_list.total_collected_items >= 4){
 							overlapping_task.animation.frameIndex = overlapping_task.config.details.frame_index_complete;
-							task_list.mark_task_complete(overlapping_task.placement.location);
 							Sound.play_task_complete();
 						}
 					}
@@ -290,7 +300,6 @@ class PlayStateDungen extends FlxState
 	}
 
 
-	var total_collect_items:Int = 0;
 	function deposit_collected_items()
 	{
 		var seconds_per_item = 0.7;
@@ -300,7 +309,7 @@ class PlayStateDungen extends FlxState
 		show_time_bonus(time_bonus_total);
 		for (item in collected_items)
 		{
-			total_collect_items++;
+			task_list.total_collected_items++;
 			// todo - animate item deposit
 			// todo - count items ? tally score ?
 			item.kill();

@@ -9,12 +9,14 @@ class TaskList
 	var tasks_to_complete:Array<Location>;
 	var completed_tasks:Array<Location>;
 	var on_task_complete:Map<Location, () -> Void> = [];
-
+	public var total_collected_items:Int = 0;
+	var total_needed_items:Int = 4;
+	
 	public var seconds_allotted(default, null):Float;
 
 	public function new(tasks_to_complete:Array<Location>)
 	{
-		this.tasks_to_complete = tasks_to_complete;
+		this.tasks_to_complete = tasks_to_complete.filter(location -> location != BASKET);
 		trace('tasks_to_complete');
 		trace(tasks_to_complete);
 		this.completed_tasks = [];
@@ -35,7 +37,7 @@ class TaskList
 
 	public function is_list_complete():Bool
 	{
-		return completed_tasks.length == tasks_to_complete.length;
+		return completed_tasks.length == tasks_to_complete.length && total_collected_items >= total_needed_items;
 	}
 
 	public function mark_task_complete(location:Location)
