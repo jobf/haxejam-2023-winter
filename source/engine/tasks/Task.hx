@@ -127,7 +127,9 @@ class Task extends FlxSprite
 			if (task_remaining_seconds <= 0)
 			{
 				on_task_complete();
-				animation.frameIndex = config.details.frame_index_complete;
+				if(placement.location != BASKET){
+					animation.frameIndex = config.details.frame_index_complete;
+				}
 				// trace('is cooling off');
 				is_cooling_off = true;
 				hint_state = COOLING_OFF;

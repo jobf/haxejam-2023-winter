@@ -225,6 +225,7 @@ class PlayStateDungen extends FlxState
 						task_on_complete();
 						// if collected at least half of the laundry we call it complete
 						if(total_collect_items >= 4){
+							overlapping_task.animation.frameIndex = overlapping_task.config.details.frame_index_complete;
 							task_list.mark_task_complete(overlapping_task.placement.location);
 							Sound.play_task_complete();
 						}
