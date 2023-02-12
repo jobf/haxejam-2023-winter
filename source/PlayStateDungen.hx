@@ -33,7 +33,7 @@ class PlayStateDungen extends FlxState
 	var is_player_moving:Bool = false;
 	var camera_zoom_tween:FlxTween;
 	var zoom_out_max:Float = 0.72;
-	var zoom_increment:Float = 0.005;
+	var zoom_increment:Float = 0.002;
 	var apartment:ApartmentDungen;
 	var collected_items:Array<Item> = [];
 	var collection_size:Int = 16;
@@ -87,7 +87,7 @@ class PlayStateDungen extends FlxState
 		FlxG.worldBounds.height = apartment.map_auto.height;
 
 		FlxG.camera.follow(apartment.player);
-		FlxG.camera.setScrollBoundsRect(0, 0, FlxG.worldBounds.width, FlxG.worldBounds.height);
+		// FlxG.camera.setScrollBoundsRect(0, 0, FlxG.worldBounds.width, FlxG.worldBounds.height);
 		controller = new Controller(apartment.player);
 
 		apartment.player.on_start_moving = () -> player_started_moving();
