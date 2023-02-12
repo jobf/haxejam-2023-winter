@@ -20,9 +20,6 @@ class TaskList
 		trace('tasks_to_complete');
 		trace(tasks_to_complete);
 		this.completed_tasks = [];
-		#if speedrun
-		task_time_allowed = 2;
-		#end
 
 		// start with something to give em a change
 		seconds_allotted = 10;

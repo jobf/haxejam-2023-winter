@@ -57,7 +57,6 @@ class PlayStateDungen extends FlxState
 		super.create();
 		Progression.reset();
 
-
 		bgColor = FlxColor.WHITE;
 		FlxG.worldBounds.width = 4096;
 		FlxG.worldBounds.height = 4096;
@@ -137,6 +136,7 @@ class PlayStateDungen extends FlxState
 		apartment.player.animation.stop();
 		apartment.player.animation.frameIndex = apartment.player.config.animation_frame_index_idle;
 		apartment.player.stop(false, true);
+		Music.stop();
 		if(task_list.is_list_complete())
 		{
 			Progression.completed_session_count++;
@@ -150,16 +150,30 @@ class PlayStateDungen extends FlxState
 	}
 
 	function start_score_state(){
-		Music.stop();
 		var scoreBg = 0xfffec7fb;
-		FlxSpriteUtil.fadeOut(apartment.player, 1.25, tween -> FlxG.camera.fade(scoreBg, 2, false, ()-> FlxG.switchState(new ScoreState())));
+		collected_laundry.clear();
+		FlxSpriteUtil.fadeOut(apartment.player, 1.25);
+		var pause_for_thought = new FlxTimer();
+		pause_for_thought.start(1.5, timer -> {
+			FlxG.camera.fade(scoreBg, 2, false, ()->{
+				var session_text = hud.show_text("Oh no!\nYou ran out of time!");
+				FlxSpriteUtil.fadeOut(session_text, 3.5, tween -> {
+					FlxG.switchState(new ScoreState());
+				});
+			});
+		});
 	}
 
 	function start_next_level():Void
 	{
 		var pause_for_thought = new FlxTimer();
-		pause_for_thought.start(2.0, timer -> {
-			FlxG.camera.fade(FlxColor.WHITE, 2, false, () -> FlxG.switchState(new PlayStateDungen()));
+		pause_for_thought.start(1.5, timer -> {
+			FlxG.camera.fade(FlxColor.WHITE, 2, false, ()->{
+				var session_text = hud.show_text("Congratulations!\nStarting new day!");
+				FlxSpriteUtil.fadeOut(session_text, 3.5, tween -> {
+					FlxG.switchState(new PlayStateDungen());
+				});
+			});
 		});
 	}
 
@@ -371,6 +385,19 @@ class Hud extends FlxGroup
 		background = new FlxSprite(x, 0);
 		background.makeGraphic(1, 1, FlxColor.TRANSPARENT);
 		add(background);
+	}
+
+	public function show_text(text:String):FlxBitmapText {
+		var session_text = new FlxBitmapText(Fonts.normal());
+		// session_text.background = true;
+		// session_text.backgroundColor = FlxColor.WHITE;
+		session_text.fieldWidth = FlxG.width;
+		session_text.alignment = CENTER;
+		session_text.text = text;
+		session_text.scrollFactor.set(0,0);
+		add(session_text);
+		session_text.screenCenter();
+		return session_text;
 	}
 }
 
