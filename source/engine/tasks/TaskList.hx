@@ -23,7 +23,8 @@ class TaskList
 
 		// start with something to give em a change
 		seconds_allotted = 10;
-		var time_reduction = 0.1; // knock some time off to up the urgency
+		// var time_reduction = 0.115 * Progression.completed_session_count; // knock some time off to up the urgency
+		var time_reduction = 0.115; // knock some time off to up the urgency
 		for (location in tasks_to_complete)
 		{
 			var task_duration = TaskData.configurations[location].task_duration_seconds;
@@ -94,7 +95,7 @@ class TaskData
 			room: WASH,
 			task_duration_seconds: 0.25,
 			task_cooloff_seconds: 0.0,
-			hint_text: "BRING ME CLOTHES !",
+			hint_text: "Bring me clothes!",
 			is_repeatable: true
 		},
 		LAVATORY => {

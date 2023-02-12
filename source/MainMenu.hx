@@ -23,7 +23,10 @@ class MainMenu extends FlxState
 		FlxG.camera.bgColor = FlxColor.WHITE;
 		super.create();
 
-		add(new FlxSprite(0, 64, 'assets/images/title.png').screenCenter(X));
+		var title = new FlxSprite(0, 0, 'assets/images/title.png');
+		title.screenCenter();
+		title.y -= 64;
+		add(title);
 
 		instructions = new FlxBitmapText(Fonts.normal());
 		instructions.alignment = FlxTextAlign.CENTER;

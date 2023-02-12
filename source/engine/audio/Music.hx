@@ -24,7 +24,7 @@ class Music
 	}
 	
 	static public function stop(){
-		var is_music_playing = FlxG.sound.music != null && FlxG.sound.music.playing;
+		var is_music_playing = FlxG.sound.music != null;
 		if(is_music_playing){
 			FlxG.sound.music.stop();
 		}
@@ -32,11 +32,13 @@ class Music
 	
 	static public function play_menu_music()
 	{
+		stop();
 		play(menu_path);
 	}
 	
 	static public function play_game_music()
 	{
+		stop();
 		play(game_path);
 	}
 
