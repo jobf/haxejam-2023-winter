@@ -194,13 +194,14 @@ class ApartmentDungen extends FlxGroup
 
 		var floor_canvas = new AsciiCanvas(w, h);
 		
-		// todo - finish kitchen tiles once that area is defined
-		if (task_zone_lookup.exists(KITCHEN))
-		{
-			var kitchen = task_zone_lookup[KITCHEN];
-			// fill kitchen tiles
-			// floor_canvas.draw_rectangle()
-		}
+		// todo - this is bugged, debug if there is time
+		// fill kitchen tiles
+		// if (task_zone_lookup.exists(KITCHEN))
+		// {
+		// 	var kitchen = task_zone_lookup[KITCHEN];
+		// 	floor_canvas.draw_rectangle(kitchen.config.rect, "2", 0,0,true);
+		// }
+		
 		floor_map.loadMapFromCSV(floor_canvas.csv("1"), "assets/images/carpet-00.png", 32, 32);
 
 		apartment_canvas.draw_rectangle(external, "#", 0, 0);
