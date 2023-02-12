@@ -18,7 +18,8 @@ class Main extends Sprite
 		#if original
 		addChild(new FlxGame(0, 0, PlayState, zoom, update_rate, draw_rate, skip_splash, start_full_screen));
 		#else
-		addChild(new FlxGame(0, 0, PlayStateDungen, zoom, update_rate, draw_rate, skip_splash, start_full_screen));
+		//addChild(new FlxGame(0, 0, PlayStateDungen, zoom, update_rate, draw_rate, skip_splash, start_full_screen));
+		addChild(new FlxGame(0,0,MainMenu,update_rate,draw_rate,skip_splash,start_full_screen));
 		#end
 
 
