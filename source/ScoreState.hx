@@ -21,20 +21,20 @@ class ScoreState extends FlxState{
 		var time_bonus = score_per_second * Progression.completed_session_time;
 		var total_score = time_bonus * Progression.completed_session_count;
 		
-		score_amount = new FlxBitmapText(Fonts.normal());
+		score_amount = new FlxBitmapText(Fonts.small());
 		add(score_amount);
 		// score_amount.autoSize = true;
 		score_amount.text = 'BONUS = ' + FlxStringUtil.formatMoney(time_bonus);
 		score_amount.screenCenter();
 		score_amount.y -= 150;
 		
-		score_modifier = new FlxBitmapText(Fonts.normal());
+		score_modifier = new FlxBitmapText(Fonts.small());
 		add(score_modifier);
 		score_modifier.text = '${Progression.completed_session_count} COMPLETED SESSIONS';
 		score_modifier.screenCenter();
 		score_modifier.y -= 50;
 
-		score_message = new FlxBitmapText(Fonts.normal());
+		score_message = new FlxBitmapText(Fonts.small());
 		add(score_message);
 		score_message.text = 'TOTAL = ${FlxStringUtil.formatMoney(total_score)} !!!';
 		score_message.screenCenter();
@@ -47,7 +47,7 @@ class ScoreState extends FlxState{
 		instructions.y += 150;
 
 
-		// FlxSpriteUtil.flicker(score_message, 100, 0.25, true, true);
+		FlxSpriteUtil.flicker(score_message, 100, 0.25, true, true);
 	}
 
 	override function update(elapsed:Float) {

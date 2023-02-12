@@ -110,7 +110,9 @@ class PlayStateDungen extends FlxState
 		session_timer = new SessionTimer(task_list.seconds_allotted, ()-> end_level());
 		// level_timer.start(task_list.seconds_allotted, timer -> end_level());
 
-		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, 
+		var color_bg = ProgressColors.color_bg;
+		var color_fg = ProgressColors.color_fg;
+		level_progress_bar = new CallbackFlxBar(0, 0, LEFT_TO_RIGHT, FlxG.width, 10, color_bg, color_fg,
 			() -> session_timer.get_time_remaining(),0, task_list.seconds_allotted);
 		level_progress_bar.scrollFactor.set(0, 0);
 		level_progress_bar.cameras = [hud_camera];

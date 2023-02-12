@@ -69,8 +69,25 @@ class TaskList
 	}
 }
 
+class ProgressColors{
+	public static var color_bg:Int = 0xff005100;
+	public static var color_fg:Int = 0xff00F400;
+
+	public static var color_bg_medium:Int = 0xff615900;
+	public static var color_fg_medium:Int = 0xfff4e000;
+
+
+	public static var color_bg_long:Int = 0xff610000;
+	public static var color_fg_long:Int = 0xfff40000;
+}
+
+
 class TaskData
 {
+	public static var task_duration_short:Float = 0.75;
+	public static var task_duration_medium:Float = 1.5;
+	public static var task_duration_long:Float = 3.0;
+	
 	public static var configurations:Map<Location, TaskDetails> = [
 		BASKET => {
 			frame_index: 32,
@@ -85,14 +102,14 @@ class TaskData
 			frame_index: 48,
 			frame_index_complete: 56,
 			room: WC,
-			task_duration_seconds: 3.0,
+			task_duration_seconds: task_duration_long,
 			is_repeatable: false,
 		},
 		RUG => {
 			frame_index: 16,
 			frame_index_complete: 24,
 			room: EMPTY,
-			task_duration_seconds: 1.5,
+			task_duration_seconds: task_duration_short,
 			is_repeatable: false,
 			variations_count: 4
 		},
@@ -100,7 +117,7 @@ class TaskData
 			frame_index: 0,
 			frame_index_complete: 8,
 			room: BEDROOM,
-			task_duration_seconds: 2.0,
+			task_duration_seconds: task_duration_medium,
 			is_repeatable: false,
 			variations_count: 4
 		},
@@ -108,28 +125,28 @@ class TaskData
 			frame_index: 33,
 			frame_index_complete: 41,
 			room: BEDROOM,
-			task_duration_seconds: 2.0,
+			task_duration_seconds: task_duration_short,
 			is_repeatable: false,
 		},
 		BATH => {
 			frame_index: 35,
 			frame_index_complete: 43,
 			room: BATH,
-			task_duration_seconds: 2.0,
+			task_duration_seconds: task_duration_long,
 			is_repeatable: false,
 		},
 		DISHES => {
 			frame_index: 34,
 			frame_index_complete: 42,
 			room: KITCHEN,
-			task_duration_seconds: 2.0,
+			task_duration_seconds: task_duration_medium,
 			is_repeatable: false,
 		},
 		SHOWER => {
 			frame_index: 36,
 			frame_index_complete: 44,
 			room: BATH,
-			task_duration_seconds: 2.0,
+			task_duration_seconds: task_duration_long,
 			is_repeatable: false,
 		},
 	];

@@ -5,6 +5,8 @@ import engine.flx.CallbackFlxBar;
 import engine.map.BluePrint.Rectangle;
 import engine.map.BluePrint;
 import engine.map.Data;
+import engine.tasks.TaskList.ProgressColors;
+import engine.tasks.TaskList.TaskData;
 import engine.tasks.TaskList.TaskDetails;
 import engine.ui.Fonts;
 import flixel.FlxG;
@@ -84,7 +86,30 @@ class Task extends FlxSprite
 		task_remaining_seconds = config.details.task_duration_seconds;
 		is_cooling_off = false;
 		timer = new FlxTimer();
-		progress_meter = new CallbackFlxBar(x + config.details.frame_size + 4, y, BOTTOM_TO_TOP, 20, 30, () -> get_progress(), 0, get_duration());
+
+		var color_bg = ProgressColors.color_bg;
+		var color_fg = ProgressColors.color_fg;
+		if(config.details.task_duration_seconds >= TaskData.task_duration_medium){
+			color_bg = ProgressColors.color_bg_medium;
+			color_fg = ProgressColors.color_fg_medium;
+		}
+
+		if(config.details.task_duration_seconds >= TaskData.task_duration_long){
+			color_bg = ProgressColors.color_bg_long;
+			color_fg = ProgressColors.color_fg_long;
+		}
+		progress_meter = new CallbackFlxBar(
+			x + config.details.frame_size + 4, 
+			y, 
+			BOTTOM_TO_TOP, 
+			20, 
+			30, 
+			color_bg,
+			color_fg,
+			() -> get_progress(),
+			0,
+			get_duration()
+		);
 		hint = new Hint(config.details);
 		hint_state = READY;
 		trace('init task : $x $y');
