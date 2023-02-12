@@ -203,12 +203,12 @@ class Progression
 		completed_session_count = 999;
 		#end
 
-		if (completed_session_count > 1)
+		if (completed_session_count >= 1)
 		{
 			tasks.push(LAVATORY);
 		}
 
-		if (completed_session_count > 2)
+		if (completed_session_count >= 2)
 		{
 			tasks.push(BED);
 		}
