@@ -78,8 +78,8 @@ class Task extends FlxSprite
 		var frame_index = config.details.frame_index;
 		if(config.details.variations_count > 0){
 			var frame_index_offset = FlxG.random.int(0, config.details.variations_count);
-			frame_index += frame_index_offset;
-			config.details.frame_index_complete += frame_index_offset;
+			frame_index = config.details.frame_index + frame_index_offset;
+			config.details.frame_index_complete = frame_index + 8;
 		}
 		animation.frameIndex = frame_index;
 		immovable = true;
