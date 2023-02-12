@@ -55,7 +55,7 @@ class PlayStateDungen extends FlxState
 		Progression.reset();
 
 
-		bgColor = 0xff959595;
+		bgColor = FlxColor.WHITE;
 		FlxG.worldBounds.width = 4096;
 		FlxG.worldBounds.height = 4096;
 
@@ -136,7 +136,7 @@ class PlayStateDungen extends FlxState
 		}
 		else{
 			Music.stop();
-			var scoreBg = 0xff937d66;
+			var scoreBg = 0xfffec7fb;
 			var go_to_score_state = ()-> FlxG.switchState(new ScoreState());
 			FlxG.camera.fade(scoreBg, 1, false, go_to_score_state);
 		}

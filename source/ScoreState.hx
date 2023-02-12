@@ -16,7 +16,7 @@ class ScoreState extends FlxState{
 
 	override function create() {
 		super.create();
-		bgColor = 0xff937d66;
+		bgColor = 0xfffec7fb;
 		var score_per_second = 12;
 		var time_bonus = score_per_second * Progression.completed_session_time;
 		var total_score = time_bonus * Progression.completed_session_count;
@@ -47,7 +47,7 @@ class ScoreState extends FlxState{
 		instructions.y += 150;
 
 
-		FlxSpriteUtil.flicker(score_message, 100, 0.25, true, true);
+		// FlxSpriteUtil.flicker(score_message, 100, 0.25, true, true);
 	}
 
 	override function update(elapsed:Float) {
