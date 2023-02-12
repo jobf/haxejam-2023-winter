@@ -1,5 +1,6 @@
 package engine.tasks;
 
+import engine.audio.Sound;
 import engine.building.Layout.Location;
 import engine.map.Data.Room;
 
@@ -61,6 +62,7 @@ class TaskList
 			else if (!completed_tasks.contains(location))
 			{
 				mark_task_complete(location);
+				Sound.play_task_complete();
 				on_complete();
 			}
 		}

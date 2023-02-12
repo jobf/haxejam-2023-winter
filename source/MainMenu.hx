@@ -1,5 +1,6 @@
 package;
 
+import engine.audio.Music;
 import engine.tasks.TaskList;
 import engine.ui.Fonts;
 import flixel.FlxG;
@@ -28,11 +29,13 @@ class MainMenu extends FlxState
 		instructions.screenCenter(X);
 		instructions.y = FlxG.height - instructions.height - 64;
 		add(instructions);
+		Music.play_menu_music();
 	}
 
 	override function update(elapsed:Float) {
 		super.update(elapsed);
 		if(FlxG.keys.justReleased.ENTER){
+			Music.stop();
 			var is_hard_reset = true;
 			Progression.reset(is_hard_reset);
 			FlxG.switchState(new PlayStateDungen());

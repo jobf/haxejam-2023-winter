@@ -2,6 +2,8 @@ package;
 
 import engine.actor.Actor;
 import engine.actor.Controller;
+import engine.audio.Music;
+import engine.audio.Sound;
 import engine.building.ApartmentDungen;
 import engine.building.Layout;
 import engine.flx.CallbackFlxBar;
@@ -51,6 +53,8 @@ class PlayStateDungen extends FlxState
 	{
 		super.create();
 		Progression.reset();
+
+
 		bgColor = 0xff959595;
 		FlxG.worldBounds.width = 4096;
 		FlxG.worldBounds.height = 4096;
@@ -115,6 +119,7 @@ class PlayStateDungen extends FlxState
 		}
 		hud.add(level_progress_bar);
 		hud.add(apartment.hint_texts);
+		Music.play_game_music();
 	}
 
 	function end_level()
@@ -130,6 +135,7 @@ class PlayStateDungen extends FlxState
 			FlxG.camera.fade(FlxColor.WHITE, 1, false, start_next_level);
 		}
 		else{
+			Music.stop();
 			var scoreBg = 0xff937d66;
 			var go_to_score_state = ()-> FlxG.switchState(new ScoreState());
 			FlxG.camera.fade(scoreBg, 1, false, go_to_score_state);
@@ -215,6 +221,7 @@ class PlayStateDungen extends FlxState
 						// if collected at least half of the laundry we call it complete
 						if(total_collect_items >= 4){
 							task_list.mark_task_complete(overlapping_task.placement.location);
+							Sound.play_task_complete();
 						}
 					}
 					overlapping_task.decrease_task_remaining(elapsed, on_complete);
@@ -286,6 +293,7 @@ class PlayStateDungen extends FlxState
 
 	function collect(laundry:Item)
 	{
+		Sound.play_item_collect();
 		var collection_size = 32;
 		laundry.kill();
 		var collected = new Item({
