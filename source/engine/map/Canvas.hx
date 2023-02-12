@@ -124,6 +124,7 @@ class AsciiCanvas extends GridLogic
 			// todo - this is dirty, clean it up
 			cleaned = StringTools.replace(cleaned, "B", empty_tile);
 			cleaned = StringTools.replace(cleaned, "L", empty_tile);
+			cleaned = StringTools.replace(cleaned, "T", empty_tile);
 			
 			cleaned = StringTools.replace(cleaned, "##", "#");
 			cleaned = StringTools.replace(cleaned, "#", "1");

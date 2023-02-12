@@ -273,12 +273,20 @@ class ApartmentDungen extends FlxGroup
 					}
 					space.task = location;
 					space.is_occupied = true;
+					// mark task space so we can avoid using it as an empty space
+					apartment_canvas.draw_rectangle({
+						x: Std.int(space.shape.x / grid_size) + 1,
+						y: Std.int(space.shape.y / grid_size) + 1,
+						w: Std.int(space.shape.w / grid_size),
+						h: Std.int(space.shape.h / grid_size)
+					}, "T", edge_left, edge_top, true);
 					place_task(placement, task_details);
 					task_is_placed = true;
 				}
 			}
 		}
 
+		apartment_canvas.print();
 		empty_spots = apartment_canvas.get_empty_spaces(grid_size);
 
 		// shuffle the empty spots before distributing items
