@@ -7,6 +7,7 @@ import engine.map.BluePrint;
 import engine.map.Data;
 import engine.tasks.TaskList.TaskDetails;
 import engine.ui.Fonts;
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.text.FlxBitmapText;
 import flixel.util.FlxColor;
@@ -70,8 +71,15 @@ class Task extends FlxSprite
 		super(config.x, config.y);
 		this.config = config;
 		this.placement = placement;
+		
 		loadGraphic(config.details.asset_path, true, config.details.frame_size, config.details.frame_size);
-		animation.frameIndex = config.details.frame_index;
+		var frame_index = config.details.frame_index;
+		if(config.details.variations_count > 0){
+			var frame_index_offset = FlxG.random.int(0, config.details.variations_count);
+			frame_index += frame_index_offset;
+			config.details.frame_index_complete += frame_index_offset;
+		}
+		animation.frameIndex = frame_index;
 		immovable = true;
 		task_remaining_seconds = config.details.task_duration_seconds;
 		is_cooling_off = false;
