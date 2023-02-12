@@ -11,14 +11,17 @@ import engine.map.BluePrint;
 import engine.tasks.Item;
 import engine.tasks.Task;
 import engine.tasks.TaskList;
+import engine.ui.Fonts;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxGroup;
+import flixel.text.FlxBitmapText;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxSpriteUtil;
+import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
 
 class PlayStateDungen extends FlxState
@@ -248,8 +251,19 @@ class PlayStateDungen extends FlxState
 		}
 	}
 
-	function show_time_bonus(seconds:Float){
-		// var text = 
+	function show_time_bonus(time_bonus:Float){
+		var time_text:String = FlxStringUtil.formatMoney(time_bonus);
+		var x = apartment.player.x;
+		var y = apartment.player.y;
+		var y_start = y - 32;
+		var y_end = y_start - 48;
+		var text = new FlxBitmapText(Fonts.small());
+		text.text = '+$time_text';
+		text.x = x;
+		text.y = y_start;
+		add(text);
+		FlxSpriteUtil.fadeOut(text);
+		FlxTween.tween(text, {y: y_end});
 	}
 
 	function gain_time() {
@@ -260,6 +274,7 @@ class PlayStateDungen extends FlxState
 		
 		var time_bonus = overlapping_task.config.details.time_bonus;
 		session_timer.gain_time(time_bonus);
+		show_time_bonus(time_bonus);
 	}
 	
 
@@ -281,7 +296,7 @@ class PlayStateDungen extends FlxState
 		var time_bonus_total  = collected_items.length * seconds_per_item;
 		trace('deposit_collected_items $seconds_per_item * ${collected_items.length} = $time_bonus_total');
 		session_timer.gain_time(time_bonus_total);
-		
+		show_time_bonus(time_bonus_total);
 		for (item in collected_items)
 		{
 			total_collect_items++;
