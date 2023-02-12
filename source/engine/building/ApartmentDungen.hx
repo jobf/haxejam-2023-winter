@@ -102,7 +102,7 @@ class ApartmentDungen extends FlxGroup
 				case KITCHEN: FlxColor.GRAY;
 				case _: FlxColor.BLACK;
 			}
-			tazk_zone_color.alpha = 40;
+			tazk_zone_color.alpha = 0;
 
 			var zone_config:TaskZoneConfig = {
 				x_pixel: x_task_zone,
