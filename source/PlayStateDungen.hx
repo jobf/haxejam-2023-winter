@@ -137,6 +137,7 @@ class PlayStateDungen extends FlxState
 		apartment.player.animation.frameIndex = apartment.player.config.animation_frame_index_idle;
 		apartment.player.stop(false, true);
 		Music.stop();
+		collected_laundry.clear();
 		if(task_list.is_list_complete())
 		{
 			Progression.completed_session_count++;
@@ -151,7 +152,6 @@ class PlayStateDungen extends FlxState
 
 	function start_score_state(){
 		var scoreBg = 0xfffec7fb;
-		collected_laundry.clear();
 		FlxSpriteUtil.fadeOut(apartment.player, 1.25);
 		var pause_for_thought = new FlxTimer();
 		pause_for_thought.start(1.5, timer -> {
