@@ -110,7 +110,9 @@ class TaskData
 			room: EMPTY,
 			task_duration_seconds: task_duration_short,
 			is_repeatable: false,
-			variations_count: 4
+			variations_count: 4,
+			hint_text: "Every day?",
+			hint_completed_text: "Nice and neat!"
 		},
 		BED => {
 			frame_index: 0,
@@ -118,7 +120,9 @@ class TaskData
 			room: BEDROOM,
 			task_duration_seconds: task_duration_medium,
 			is_repeatable: false,
-			variations_count: 4
+			variations_count: 4,
+			hint_text: "Must fix the bed",
+			hint_completed_text: "Much better!"
 		},
 		DRAWERS => {
 			frame_index: 33,
@@ -126,6 +130,8 @@ class TaskData
 			room: BEDROOM,
 			task_duration_seconds: task_duration_short,
 			is_repeatable: false,
+			hint_text: "Pesky socks",
+			hint_completed_text: "And stay closed!"
 		},
 		BATH => {
 			frame_index: 35,
@@ -133,6 +139,8 @@ class TaskData
 			room: BATH,
 			task_duration_seconds: task_duration_long,
 			is_repeatable: false,
+			hint_text: "Filthy as usual!",
+			hint_completed_text: "Scrub a dub dub!"
 		},
 		DISHES => {
 			frame_index: 34,
@@ -140,6 +148,8 @@ class TaskData
 			room: KITCHEN,
 			task_duration_seconds: task_duration_medium,
 			is_repeatable: false,
+			hint_text: "Why me??",
+			hint_completed_text: "Now they can eat!"
 		},
 		SHOWER => {
 			frame_index: 36,
@@ -147,6 +157,8 @@ class TaskData
 			room: BATH,
 			task_duration_seconds: task_duration_long,
 			is_repeatable: false,
+			hint_text: "Disgusting!",
+			hint_completed_text: "Phew, sparkling!"
 		},
 	];
 }
