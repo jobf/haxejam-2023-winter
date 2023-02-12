@@ -5,6 +5,7 @@ import engine.building.Layout;
 import engine.map.BluePrint;
 import engine.map.Canvas.AsciiCanvas;
 import engine.map.Data;
+import engine.map.Dungen.ApartmentGenerator;
 import engine.tasks.Item;
 import engine.tasks.Task;
 import engine.tasks.TaskList;
@@ -57,8 +58,7 @@ class ApartmentDungen extends FlxGroup
 
 		var apartment_canvas = new AsciiCanvas(w, h);
 
-		// order of first three ROOM types are set in Dungen
-		var small_rooms = config.rooms.splice(0, 3);
+		var small_rooms = config.rooms.splice(0, ApartmentGenerator.room_order.length - 1);
 		var large_rooms = config.rooms.splice(config.rooms.length - 1, config.rooms.length);
 		var all_rooms = small_rooms.concat(large_rooms);
 		var task_zone_lookup:Map<Room, TaskZone> = [];

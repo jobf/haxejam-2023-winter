@@ -14,14 +14,15 @@ using dropecho.dungen.Map2d;
 
 class ApartmentGenerator
 {
+	public static var room_order:Array<Room> = [
+		WC,
+		BATH,
+		WASH,
+		KITCHEN,
+		BEDROOM
+	];
 	public static function buildRooms(tree:BSPTree<BSPData>, config:ApartmentConfig, ?opts:Dynamic = null):Map2d
 	{
-		var room_order:Array<Room> = [
-			WC,
-			BATH,
-			WASH,
-			BEDROOM
-		];
 		
 		var found_player = false;
 		
