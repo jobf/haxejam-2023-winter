@@ -154,10 +154,10 @@ class PlayStateDungen extends FlxState
 		var scoreBg = 0xfffec7fb;
 		FlxSpriteUtil.fadeOut(apartment.player, 1.25);
 		var pause_for_thought = new FlxTimer();
-		pause_for_thought.start(1.5, timer -> {
-			FlxG.camera.fade(scoreBg, 2, false, ()->{
+		pause_for_thought.start(0.5, timer -> {
+			FlxG.camera.fade(scoreBg, 1, false, ()->{
 				var session_text = hud.show_text("Oh no!\nYou ran out of time!");
-				FlxSpriteUtil.fadeOut(session_text, 3.5, tween -> {
+				FlxSpriteUtil.fadeOut(session_text, 1.5, tween -> {
 					FlxG.switchState(new ScoreState());
 				});
 			});
@@ -167,10 +167,10 @@ class PlayStateDungen extends FlxState
 	function start_next_level():Void
 	{
 		var pause_for_thought = new FlxTimer();
-		pause_for_thought.start(1.5, timer -> {
-			FlxG.camera.fade(FlxColor.WHITE, 2, false, ()->{
+		pause_for_thought.start(0.5, timer -> {
+			FlxG.camera.fade(FlxColor.WHITE, 1, false, ()->{
 				var session_text = hud.show_text("Congratulations!\nStarting new day!");
-				FlxSpriteUtil.fadeOut(session_text, 3.5, tween -> {
+				FlxSpriteUtil.fadeOut(session_text, 1.5, tween -> {
 					FlxG.switchState(new PlayStateDungen());
 				});
 			});
